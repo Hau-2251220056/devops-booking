@@ -1,0 +1,23 @@
+.site-footer{background:#0f1724;color:#fff;margin-top:40px}
+.newsletter{background:linear-gradient(90deg,#f59e0b,#d97706);padding:28px 0}
+.newsletter-grid{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.newsletter-grid h3{margin:0;font-size:20px}
+.newsletter-form{display:flex;gap:8px}
+.newsletter-form input{padding:10px;border-radius:8px;border:0;width:320px}
+.newsletter-form button{background:#fff;color:#c2410c;padding:10px;border-radius:8px;border:0;font-weight:700}
+.subscribed{color:#fff;margin-top:8px}
+.footer-main{padding:28px 0}
+.footer-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:20px}
+.footer-grid h4{color:#fff;margin-bottom:8px}
+.contact-list div{display:flex;gap:8px;align-items:center;color:#cbd5e1}
+.quick-links{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:6px}
+.quick-links a{color:#cbd5e1;text-decoration:none}
+.socials a{color:#cbd5e1;margin-right:8px;font-size:18px}
+.footer-bottom{border-top:1px solid rgba(255,255,255,0.04);padding-top:16px;display:flex;justify-content:space-between;align-items:center;color:#94a3b8}
+.legal-links a{margin-left:12px;color:#94a3b8;text-decoration:none}
+
+@media (max-width:900px){
+  .newsletter-grid{flex-direction:column;align-items:flex-start}
+  .footer-grid{grid-template-columns:1fr;}
+  .newsletter-form input{width:100%}
+}
