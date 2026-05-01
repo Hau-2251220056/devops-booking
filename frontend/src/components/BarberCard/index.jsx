@@ -1,19 +1,19 @@
 // @ts-nocheck
-import { FaStar, FaBriefcase, FaCheckCircle } from 'react-icons/fa';
-import './BarberCard.css';
+import { FaStar, FaBriefcase, FaCheckCircle } from "react-icons/fa";
+import "./BarberCard.css";
 
 function BarberCard({ barber }) {
   const {
     user = {},
-    specialization = 'Specialization',
+    specialization = "Specialization",
     experienceYears = 0,
     rating = 5,
-    bio = 'Professional barber',
-    avatarUrl = 'https://via.placeholder.com/250x250?text=Barber',
+    bio = "Professional barber",
+    avatarUrl = "https://via.placeholder.com/250x250?text=Barber",
     isAvailable = false,
   } = barber || {};
 
-  const { firstName = 'Barber', lastName = 'Name' } = user || {};
+  const { firstName = "Barber", lastName = "Name" } = user || {};
 
   const renderStars = (rate) => {
     return (
@@ -22,7 +22,7 @@ function BarberCard({ barber }) {
           <FaStar
             key={i}
             className={`text-sm ${
-              i < Math.floor(rate) ? 'text-amber-400' : 'text-gray-300'
+              i < Math.floor(rate) ? "text-amber-400" : "text-gray-300"
             }`}
           />
         ))}
@@ -34,11 +34,17 @@ function BarberCard({ barber }) {
     <div className="barber-card">
       <div className="barber-img">
         <img src={avatarUrl} alt={`${firstName} ${lastName}`} />
-        {isAvailable && <div className="available"><FaCheckCircle /> Có sẵn</div>}
+        {isAvailable && (
+          <div className="available">
+            <FaCheckCircle /> Có sẵn
+          </div>
+        )}
       </div>
 
       <div className="barber-body">
-        <h3 className="barber-name">{firstName} {lastName}</h3>
+        <h3 className="barber-name">
+          {firstName} {lastName}
+        </h3>
         <p className="barber-special">{specialization}</p>
         <p className="barber-bio">{bio}</p>
 
@@ -47,7 +53,9 @@ function BarberCard({ barber }) {
           <span className="rating-num">{Number(rating).toFixed(1)}</span>
         </div>
 
-        <div className="barber-exp"><FaBriefcase className="icon"/> {experienceYears} năm kinh nghiệm</div>
+        <div className="barber-exp">
+          <FaBriefcase className="icon" /> {experienceYears} năm kinh nghiệm
+        </div>
 
         <button className="barber-btn">Đặt lịch</button>
       </div>
