@@ -1,6 +1,6 @@
 // @ts-nocheck
 import { useEffect, useState } from "react";
-import { FaArrowRight, FaStar, FaClock, FaTag } from "react-icons/fa";
+import { FaArrowRight, FaStar, FaTag } from "react-icons/fa";
 import Header from "../../components/Header";
 import Footer from "../../components/Footer";
 import ServiceCard from "../../components/ServiceCard";
@@ -181,9 +181,13 @@ export default function Home() {
           <div className="section-title services-head">
             <div>
               <div className="eyebrow small">Dịch vụ nổi bật</div>
-              <p className="lead section-sub">Chọn salon đỉnh với những chi tiết nhỏ nhất</p>
+              <p className="lead section-sub">
+                Chọn salon đỉnh với những chi tiết nhỏ nhất
+              </p>
             </div>
-            <a href="#" className="section-link">Xem tất cả dịch vụ</a>
+            <a href="#" className="section-link">
+              Xem tất cả dịch vụ
+            </a>
           </div>
 
           {errorServices ? (
@@ -220,7 +224,10 @@ export default function Home() {
             <div className="featured featured-inline">
               <div className="featured-thumb">
                 <img
-                  src={services[1]?.imageUrl || "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?q=80&w=1000&auto=format&fit=crop"}
+                  src={
+                    services[1]?.imageUrl ||
+                    "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?q=80&w=1000&auto=format&fit=crop"
+                  }
                   alt={services[1]?.name || "Dịch vụ nổi bật"}
                 />
               </div>
