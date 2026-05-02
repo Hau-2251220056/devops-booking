@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 const ApiError = require("../utils/ApiError");
 
 const adminMiddleware = (req, res, next) => {
