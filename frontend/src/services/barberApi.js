@@ -1,12 +1,12 @@
-import axios from 'axios';
+import axios from "axios";
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
 const barberApiClient = axios.create({
   baseURL: `${API_URL}/api`,
   timeout: 10000,
   headers: {
-    'Content-Type': 'application/json',
+    "Content-Type": "application/json",
   },
 });
 
@@ -16,10 +16,10 @@ const barberApiClient = axios.create({
  */
 export const fetchBarbers = async () => {
   try {
-    const response = await barberApiClient.get('/barbers');
+    const response = await barberApiClient.get("/barbers");
     return response.data;
   } catch (error) {
-    console.error('Error fetching barbers:', error);
+    console.error("Error fetching barbers:", error);
     throw error;
   }
 };

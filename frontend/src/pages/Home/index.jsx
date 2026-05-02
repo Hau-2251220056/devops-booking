@@ -1,6 +1,6 @@
 // @ts-nocheck
 import { useEffect, useState } from "react";
-import { FaArrowRight, FaStar, FaClock, FaTag } from "react-icons/fa";
+import { FaArrowRight, FaStar, FaTag } from "react-icons/fa";
 import Header from "../../components/Header";
 import Footer from "../../components/Footer";
 import ServiceCard from "../../components/ServiceCard";
@@ -72,8 +72,9 @@ export default function Home() {
     const loadServices = async () => {
       try {
         setLoadingServices(true);
-        const data = await fetchServices();
-        setServices(data || []);
+        const response = await fetchServices();
+        const data = Array.isArray(response) ? response : response?.data || [];
+        setServices(data);
         setErrorServices(null);
       } catch (error) {
         setErrorServices("Không thể tải dịch vụ. Vui lòng thử lại.");
@@ -86,8 +87,9 @@ export default function Home() {
     const loadBarbers = async () => {
       try {
         setLoadingBarbers(true);
-        const data = await fetchBarbers();
-        setBarbers(data || []);
+        const response = await fetchBarbers();
+        const data = Array.isArray(response) ? response : response?.data || [];
+        setBarbers(data);
         setErrorBarbers(null);
       } catch (error) {
         setErrorBarbers(
@@ -112,7 +114,7 @@ export default function Home() {
         <div className="container">
           <div className="hero-grid">
             <div className="hero-left">
-              <p className="eyebrow">✨ Chào mừng đến LuxeCut Salon</p>
+              <p className="eyebrow">Trải nghiệm đẳng cấp 5 sao</p>
               <h1>Trải nghiệm cắt tóc cao cấp, phong cách của bạn</h1>
               <p className="lead">
                 Dịch vụ chuyên nghiệp, không gian sang trọng và đội ngũ thợ tay
@@ -121,17 +123,17 @@ export default function Home() {
 
               <div className="cta-row">
                 <button className="btn btn-primary">
-                  Đặt lịch ngay <FaArrowRight />
+                  Khám phá dịch vụ <FaArrowRight />
                 </button>
-                <button className="btn btn-ghost">Xem dịch vụ</button>
+                <button className="btn btn-ghost">Xem bảng giá</button>
                 <div className="stats">
                   <div className="stat">
-                    <div className="stat-number">20+</div>
-                    <div className="stat-label">Năm kinh nghiệm</div>
+                    <div className="stat-number">100%</div>
+                    <div className="stat-label">Khách hàng hài lòng</div>
                   </div>
                   <div className="stat">
-                    <div className="stat-number">5K+</div>
-                    <div className="stat-label">Khách hài lòng</div>
+                    <div className="stat-number">5+</div>
+                    <div className="stat-label">Năm kinh nghiệm</div>
                   </div>
                 </div>
               </div>
@@ -174,41 +176,18 @@ export default function Home() {
       </section>
 
       {/* Featured + Services Section */}
-      <section className="featured-and-services">
+      <section className="featured-and-services" id="services">
         <div className="container">
-          {!loadingServices && services && services.length > 0 && (
-            <div className="featured">
-              <div className="featured-left">
-                <div className="eyebrow small muted">Dịch vụ nổi bật</div>
-                <h2 className="featured-title">
-                  {services[0]?.name || "Dịch vụ cắt tóc"}
-                </h2>
-                <p className="featured-desc">
-                  {services[0]?.description ||
-                    "Trải nghiệm dịch vụ cắt tóc chuyên nghiệp với những thợ tay nghề lâu năm."}
-                </p>
-                <div className="featured-info">
-                  <div className="info-item">
-                    <FaClock />{" "}
-                    <span>{services[0]?.durationMinutes || 30} phút</span>
-                  </div>
-                  <div className="info-item">
-                    <FaTag /> <span>{services[0]?.price || "0"} VNĐ</span>
-                  </div>
-                </div>
-                <button className="btn btn-white">Đặt dịch vụ này ngay</button>
-              </div>
-              <div className="featured-right">✂️</div>
+          <div className="section-title services-head">
+            <div>
+              <div className="eyebrow small">Dịch vụ nổi bật</div>
+              <p className="lead section-sub">
+                Chọn salon đỉnh với những chi tiết nhỏ nhất
+              </p>
             </div>
-          )}
-
-          <div className="section-title">
-            <div className="eyebrow small">🎯 Dịch vụ của chúng tôi</div>
-            <h3>Các Dịch Vụ Cắt Tóc Cao Cấp</h3>
-            <p className="lead center">
-              Từ cắt tóc cổ điển đến những kiểu tóc hiện đại, chúng tôi phục vụ
-              tất cả nhu cầu của bạn.
-            </p>
+            <a href="#" className="section-link">
+              Xem tất cả dịch vụ
+            </a>
           </div>
 
           {errorServices ? (
@@ -240,11 +219,42 @@ export default function Home() {
               )}
             </div>
           )}
+
+          {!loadingServices && services && services.length > 0 && (
+            <div className="featured featured-inline">
+              <div className="featured-thumb">
+                <img
+                  src={
+                    services[1]?.imageUrl ||
+                    "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?q=80&w=1000&auto=format&fit=crop"
+                  }
+                  alt={services[1]?.name || "Dịch vụ nổi bật"}
+                />
+              </div>
+              <div className="featured-left">
+                <h2 className="featured-title">
+                  {services[1]?.name || "Nhuộm tóc cao cấp"}
+                </h2>
+                <p className="featured-desc">
+                  {services[1]?.description ||
+                    "Sử dụng các dòng thuốc nhuộm organic, an toàn cho da đầu và bền màu."}
+                </p>
+                <div className="featured-info">
+                  <div className="info-item">
+                    <FaTag /> <span>{services[1]?.price || "120000"} VNĐ</span>
+                  </div>
+                </div>
+              </div>
+              <div className="featured-actions">
+                <button className="btn btn-primary">Đặt lịch ngay</button>
+              </div>
+            </div>
+          )}
         </div>
       </section>
 
       {/* Barbers Section */}
-      <section className="barbers-section">
+      <section className="barbers-section" id="barbers">
         <div className="container">
           <div className="section-title">
             <div className="eyebrow small">👥 Đội ngũ của chúng tôi</div>
@@ -291,11 +301,7 @@ export default function Home() {
       <section className="testimonials">
         <div className="container">
           <div className="section-title">
-            <div className="eyebrow small">⭐ Đánh giá của khách hàng</div>
-            <h3>Những Lời Khen Từ Khách Hàng</h3>
-            <p className="lead center">
-              Hãy nghe những trải nghiệm tuyệt vời từ khách hàng của chúng tôi.
-            </p>
+            <div className="eyebrow small">Khách hàng nói gì về chúng tôi</div>
           </div>
 
           <div className="testimonials-grid">
@@ -324,20 +330,8 @@ export default function Home() {
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="cta-dark">
-        <div className="container center">
-          <h2 className="cta-title">Sẵn Sàng Để Thay Đổi Phong Cách?</h2>
-          <p className="lead cta-lead">
-            Đặt lịch hẹn của bạn ngay hôm nay và trải nghiệm dịch vụ cắt tóc cao
-            cấp của LuxeCut Salon.
-          </p>
-          <button className="btn btn-primary large">Đặt lịch hẹn ngay</button>
-        </div>
-      </section>
-
       {/* Prominent Blue CTA */}
-      <section className="blue-cta">
+      <section className="blue-cta" id="booking">
         <div className="container">
           <div className="blue-box">
             <h3>Sẵn sàng trải nghiệm phong cách mới?</h3>

@@ -1,13 +1,96 @@
-.service-card{background:#fff;border-radius:14px;box-shadow:0 8px 20px rgba(15,23,36,0.06);overflow:hidden;display:flex;flex-direction:column;height:100%}
-.service-img{position:relative;height:180px;overflow:hidden;background:#f3f4f6}
-.service-img img{width:100%;height:100%;object-fit:cover;transition:transform .5s}
-.service-img:hover img{transform:scale(1.06)}
-.service-category{position:absolute;top:10px;right:10px;background:#0ea5e9;color:#fff;padding:6px 10px;border-radius:999px;font-size:12px;font-weight:700}
-.service-body{padding:16px;display:flex;flex-direction:column;flex:1}
-.service-title{font-size:16px;font-weight:800;color:#0f1724;margin-bottom:8px}
-.service-desc{font-size:14px;color:#64748b;margin-bottom:12px;flex:1}
-.service-details{display:flex;gap:12px;margin-bottom:12px;font-size:14px;color:#334155}
-.detail{display:flex;align-items:center;gap:8px}
-.icon{color:#f59e0b}
-.price{font-weight:700;color:#d97706}
-.service-btn{background:linear-gradient(90deg,#f59e0b,#d97706);color:#fff;border:0;padding:10px;border-radius:10px;font-weight:700;cursor:pointer}
+.service-card {
+	background: #fff;
+	border-radius: 12px;
+	border: 1px solid #dce3ee;
+	overflow: hidden;
+	display: flex;
+	flex-direction: column;
+	height: 100%;
+}
+
+.service-img {
+	position: relative;
+	height: 176px;
+	overflow: hidden;
+	background: #eef2f8;
+}
+
+.service-img img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	transition: transform 0.45s ease;
+}
+
+.service-img:hover img {
+	transform: scale(1.05);
+}
+
+.service-category {
+	position: absolute;
+	top: 8px;
+	right: 8px;
+	background: #355fd8;
+	color: #fff;
+	padding: 5px 9px;
+	border-radius: 999px;
+	font-size: 11px;
+	font-weight: 700;
+}
+
+.service-body {
+	padding: 12px;
+	display: flex;
+	flex-direction: column;
+	flex: 1;
+}
+
+.service-title {
+	font-size: 16px;
+	font-weight: 700;
+	color: #111827;
+	margin-bottom: 4px;
+}
+
+.service-desc {
+	font-size: 13px;
+	color: #7b8798;
+	margin-bottom: 10px;
+	flex: 1;
+}
+
+.service-details {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 10px;
+	margin-bottom: 10px;
+	font-size: 13px;
+	color: #334155;
+}
+
+.detail {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+}
+
+.icon {
+	color: #355fd8;
+}
+
+.price {
+	font-weight: 700;
+	color: #355fd8;
+}
+
+.service-btn {
+	background: #f8fafd;
+	color: #1f2937;
+	border: 1px solid #ccd6e5;
+	min-height: 40px;
+	padding: 0 16px;
+	border-radius: 10px;
+	font-size: 14px;
+	font-weight: 700;
+	cursor: pointer;
+}
