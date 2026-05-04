@@ -1,13 +1,22 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { FaBars, FaTimes, FaCut } from "react-icons/fa";
+import { FaBars, FaTimes, FaCut, FaUser, FaSignOutAlt } from "react-icons/fa";
+import { useAuth } from "../../contexts/useAuth";
+import { logout as apiLogout } from "../../services/authApi";
 import "./Header.css";
 
 function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { user, logout } = useAuth();
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
+  };
+
+  const handleLogout = () => {
+    apiLogout();
+    logout();
+    setIsMenuOpen(false);
   };
 
   const menuItems = [
@@ -46,9 +55,30 @@ function Header() {
         </div>
 
         <div className="header-actions">
-          <Link to="/booking" className="btn header-cta">
-            Đặt lịch ngay
-          </Link>
+          {user ? (
+            <div className="user-menu">
+              <div className="user-info">
+                <FaUser className="user-icon" />
+                <span className="user-name">{user.firstName || user.username}</span>
+              </div>
+              <button
+                className="btn header-logout"
+                onClick={handleLogout}
+                title="Đăng xuất"
+              >
+                <FaSignOutAlt />
+              </button>
+            </div>
+          ) : (
+            <>
+              <Link to="/login" className="btn header-login">
+                Đăng nhập
+              </Link>
+              <Link to="/register" className="btn header-cta">
+                Đăng ký
+              </Link>
+            </>
+          )}
           <button className="mobile-toggle" onClick={toggleMenu}>
             {isMenuOpen ? <FaTimes /> : <FaBars />}
           </button>
@@ -67,9 +97,26 @@ function Header() {
               {item.label}
             </Link>
           ))}
-          <Link to="/booking" className="btn mobile-cta">
-            Đặt lịch ngay
-          </Link>
+          {user ? (
+            <>
+              <div className="mobile-user-info">
+                <FaUser />
+                <span>{user.firstName || user.username}</span>
+              </div>
+              <button className="btn mobile-logout" onClick={handleLogout}>
+                <FaSignOutAlt /> Đăng xuất
+              </button>
+            </>
+          ) : (
+            <>
+              <Link to="/login" className="btn mobile-login">
+                Đăng nhập
+              </Link>
+              <Link to="/register" className="btn mobile-cta">
+                Đăng ký
+              </Link>
+            </>
+          )}
         </div>
       )}
     </header>
