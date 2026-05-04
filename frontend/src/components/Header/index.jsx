@@ -11,10 +11,10 @@ function Header() {
   };
 
   const menuItems = [
-    { label: "Trang chủ", href: "#" },
-    { label: "Dịch vụ", href: "#services" },
-    { label: "Thợ cắt tóc", href: "#barbers" },
-    { label: "Lịch hẹn", href: "#booking" },
+    { label: "Trang chủ", href: "/" },
+    { label: "Dịch vụ", href: "/booking" },
+    { label: "Thợ cắt tóc", href: "/#barbers" },
+    { label: "Lịch hẹn", href: "/#booking" },
   ];
 
   return (
@@ -34,14 +34,21 @@ function Header() {
 
         <div className={`menu ${isMenuOpen ? "open" : ""}`}>
           {menuItems.map((item) => (
-            <a key={item.label} href={item.href} className="menu-item">
+            <Link
+              key={item.label}
+              to={item.href}
+              className="menu-item"
+              onClick={() => setIsMenuOpen(false)}
+            >
               {item.label}
-            </a>
+            </Link>
           ))}
         </div>
 
         <div className="header-actions">
-          <button className="btn header-cta">Đặt lịch ngay</button>
+          <Link to="/booking" className="btn header-cta">
+            Đặt lịch ngay
+          </Link>
           <button className="mobile-toggle" onClick={toggleMenu}>
             {isMenuOpen ? <FaTimes /> : <FaBars />}
           </button>
@@ -51,16 +58,18 @@ function Header() {
       {isMenuOpen && (
         <div className="mobile-menu">
           {menuItems.map((item) => (
-            <a
+            <Link
               key={item.label}
-              href={item.href}
+              to={item.href}
               className="mobile-item"
               onClick={() => setIsMenuOpen(false)}
             >
               {item.label}
-            </a>
+            </Link>
           ))}
-          <button className="btn mobile-cta">Đặt lịch ngay</button>
+          <Link to="/booking" className="btn mobile-cta">
+            Đặt lịch ngay
+          </Link>
         </div>
       )}
     </header>

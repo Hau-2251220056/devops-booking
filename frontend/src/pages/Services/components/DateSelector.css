@@ -1,0 +1,42 @@
+.date-button {
+  padding: 0.875rem 1rem;
+  border: 2px solid #e5e7eb;
+  border-radius: 0.75rem;
+  background: #fff;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #374151;
+  cursor: pointer;
+  transition: all 200ms ease;
+  min-height: 3rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.date-button:hover {
+  border-color: #3b82f6;
+  color: #3b82f6;
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.1);
+}
+
+.date-button.selected {
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+  border-color: transparent;
+  color: white;
+  font-weight: 600;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+.date-button:active {
+  transform: scale(0.95);
+}
+
+@media (max-width: 768px) {
+  .date-button {
+    padding: 0.75rem 0.5rem;
+    font-size: 0.8rem;
+    min-height: 2.75rem;
+  }
+}
