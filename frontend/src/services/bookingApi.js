@@ -10,6 +10,14 @@ const bookingApiClient = axios.create({
   },
 });
 
+bookingApiClient.interceptors.request.use((config) => {
+  const token = localStorage.getItem("token");
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
 /**
  * Create a new booking
  * @param {Object} bookingData - Booking information
@@ -32,9 +40,9 @@ export const createBooking = async (bookingData) => {
  */
 export const getAvailableSlots = async (date) => {
   try {
-    const response = await bookingApiClient.get(
-      `/bookings/available-slots/${date}`,
-    );
+    const response = await bookingApiClient.get("/bookings/available-slots", {
+      params: date,
+    });
     return response.data;
   } catch (error) {
     console.error("Error fetching available slots:", error);

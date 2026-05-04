@@ -5,7 +5,7 @@ function ServiceSelector({ services, selectedService, onSelectService }) {
   return (
     <div className="booking-section">
       <h2 className="section-title">
-        <span className="step-number">1</span>
+        <span className="step-number">2</span>
         Chọn dịch vụ
       </h2>
 
@@ -13,9 +13,8 @@ function ServiceSelector({ services, selectedService, onSelectService }) {
         {services.map((service) => (
           <div
             key={service.id}
-            className={`service-card ${
-              selectedService?.id === service.id ? "selected" : ""
-            }`}
+            className={`service-card ${selectedService?.id === service.id ? "selected" : ""
+              }`}
             onClick={() => onSelectService(service)}
             role="button"
             tabIndex={0}

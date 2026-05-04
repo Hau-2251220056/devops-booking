@@ -1,5 +1,6 @@
 // @ts-nocheck
 import { FaStar, FaBriefcase, FaCheckCircle } from "react-icons/fa";
+import { Link } from "react-router-dom";
 import "./BarberCard.css";
 
 function BarberCard({ barber }) {
@@ -14,6 +15,7 @@ function BarberCard({ barber }) {
   } = barber || {};
 
   const { firstName = "Barber", lastName = "Name" } = user || {};
+  const barberBookingHref = `/booking?barberId=${barber?.id || ""}`;
 
   const renderStars = (rate) => {
     return (
@@ -21,9 +23,8 @@ function BarberCard({ barber }) {
         {[...Array(5)].map((_, i) => (
           <FaStar
             key={i}
-            className={`text-sm ${
-              i < Math.floor(rate) ? "text-amber-400" : "text-gray-300"
-            }`}
+            className={`text-sm ${i < Math.floor(rate) ? "text-amber-400" : "text-gray-300"
+              }`}
           />
         ))}
       </div>
@@ -57,7 +58,9 @@ function BarberCard({ barber }) {
           <FaBriefcase className="icon" /> {experienceYears} năm kinh nghiệm
         </div>
 
-        <button className="barber-btn">Đặt lịch</button>
+        <Link to={barberBookingHref} className="barber-btn">
+          Đặt lịch
+        </Link>
       </div>
     </div>
   );

@@ -3,6 +3,7 @@ import { formatDisplayDate } from "../../../utils/dateHelper";
 import "./BookingSummary.css";
 
 function BookingSummary({
+  selectedBarber,
   selectedService,
   selectedDate,
   selectedTime,
@@ -23,6 +24,26 @@ function BookingSummary({
               <p className="service-name">{selectedService.name}</p>
               <p className="service-duration">
                 {selectedService.duration} phút
+              </p>
+            </div>
+          ) : (
+            <p className="summary-empty">Chưa chọn</p>
+          )}
+        </div>
+
+        {/* Barber */}
+        <div className="summary-item">
+          <div className="summary-header">
+            <User size={16} />
+            <span className="item-label">Thợ cắt tóc</span>
+          </div>
+          {selectedBarber ? (
+            <div className="summary-value">
+              <p className="service-name">
+                {selectedBarber?.user?.firstName || "Barber"} {selectedBarber?.user?.lastName || ""}
+              </p>
+              <p className="service-duration">
+                {selectedBarber.specialization || "Thợ cắt tóc chuyên nghiệp"}
               </p>
             </div>
           ) : (

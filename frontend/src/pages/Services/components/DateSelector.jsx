@@ -14,7 +14,7 @@ function DateSelector({ selectedDate, onSelectDate }) {
   return (
     <div className="booking-section">
       <h2 className="section-title">
-        <span className="step-number">2</span>
+        <span className="step-number">3</span>
         Chọn ngày
       </h2>
 

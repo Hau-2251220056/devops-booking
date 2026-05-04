@@ -15,7 +15,7 @@ function TimeSelector({ selectedTime, onSelectTime, disabledSlots }) {
   return (
     <div className="booking-section">
       <h2 className="section-title">
-        <span className="step-number">3</span>
+        <span className="step-number">4</span>
         Chọn giờ
       </h2>
 
@@ -27,9 +27,8 @@ function TimeSelector({ selectedTime, onSelectTime, disabledSlots }) {
           return (
             <button
               key={time}
-              className={`time-slot ${isSelected ? "selected" : ""} ${
-                isDisabled ? "disabled" : ""
-              }`}
+              className={`time-slot ${isSelected ? "selected" : ""} ${isDisabled ? "disabled" : ""
+                }`}
               onClick={() => !isDisabled && onSelectTime(time)}
               disabled={isDisabled}
               type="button"
