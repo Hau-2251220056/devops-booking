@@ -2,10 +2,35 @@ require("dotenv").config();
 
 const app = require("./app");
 
-const PORT = process.env.PORT || 5000;
+console.log("🔥 [BOOT] server.js starting...");
 
-app.listen(PORT, () => {
-  console.log(`🚀 Server is running on port ${PORT}`);
+const PORT = process.env.PORT;
+
+console.log("🌍 [ENV] PORT =", PORT);
+
+if (!PORT) {
+  console.error("❌ PORT is not defined");
+  throw new Error("PORT is not defined");
+}
+
+try {
+  app.listen(PORT, () => {
+    console.log("🚀 [SERVER] Server is running");
+    console.log(`📡 [SERVER] Listening on port: ${PORT}`);
+    console.log("🔗 Health check: /api/health");
+  });
+} catch (err) {
+  console.error("💥 [FATAL] Failed to start server:");
+  console.error(err);
+  process.exit(1);
+}
+
+process.on("uncaughtException", (err) => {
+  console.error("💥 [UNCAUGHT_EXCEPTION]");
+  console.error(err);
 });
 
-module.exports = app;
+process.on("unhandledRejection", (err) => {
+  console.error("💥 [UNHANDLED_REJECTION]");
+  console.error(err);
+});
