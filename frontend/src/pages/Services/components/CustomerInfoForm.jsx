@@ -12,7 +12,7 @@ function CustomerInfoForm({ customerInfo, onUpdateCustomerInfo, errors }) {
   return (
     <div className="booking-section">
       <h2 className="section-title">
-        <span className="step-number">4</span>
+        <span className="step-number">5</span>
         Thông tin khách hàng
       </h2>
 

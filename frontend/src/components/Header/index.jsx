@@ -22,7 +22,7 @@ function Header() {
   const menuItems = [
     { label: "Trang chủ", href: "/" },
     { label: "Dịch vụ", href: "/booking" },
-    { label: "Thợ cắt tóc", href: "/#barbers" },
+    { label: "Thợ cắt tóc", href: "/barbers" },
     { label: "Lịch hẹn", href: "/#booking" },
   ];
 
