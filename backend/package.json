@@ -13,6 +13,7 @@
     "db:push": "prisma db push",
     "db:pull": "prisma db pull",
     "db:validate": "prisma validate",
+    "db:test": "npx prisma db pull",
     "prisma:generate": "prisma generate",
     "prisma:studio": "prisma studio",
     "seed": "ts-node prisma/seed.ts",
