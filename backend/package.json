@@ -7,7 +7,7 @@
     "dev": "nodemon src/server.js",
     "start": "node src/server.js",
 
-    "build": "prisma generate",
+    "build": "prisma generate --no-engine",
 
     "migrate:deploy": "prisma migrate deploy",
     "migrate:dev": "prisma migrate dev",
@@ -18,7 +18,8 @@
 
     "seed": "node prisma/seed.js",
 
-    "lint": "echo \"no lint configured\"",
+    "lint": "eslint src tests",
+    "lint:fix": "eslint src tests --fix",
     "test": "node --test"
   },
   "keywords": [],
@@ -35,9 +36,11 @@
     "prisma": "^5.22.0"
   },
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
     "@types/bcrypt": "^6.0.0",
     "@types/bcryptjs": "^2.4.6",
     "@types/node": "^25.6.0",
+    "eslint": "^10.2.1",
     "nodemon": "^3.1.14",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.3"

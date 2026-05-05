@@ -30,18 +30,23 @@ jobs:
           cache: npm
           cache-dependency-path: backend/package-lock.json
 
+      # 1. INSTALL
       - name: Install dependencies
         run: npm ci
 
-      - name: Lint
-        run: npm run lint
-
-      - name: Test
-        run: npm run test
-
+      # Prisma nên chạy trước test để đảm bảo môi trường DB client
       - name: Prisma generate
         run: npx prisma generate
 
+      # 2. LINT
+      - name: Lint
+        run: npm run lint
+
+      # 3. TEST
+      - name: Test
+        run: npm run test
+
+      # 4. BUILD
       - name: Build
         run: npm run build
 
@@ -64,14 +69,18 @@ jobs:
           cache: npm
           cache-dependency-path: frontend/package-lock.json
 
+      # 1. INSTALL
       - name: Install dependencies
         run: npm ci
 
+      # 2. LINT (strict mode)
       - name: Lint
-        run: npm run lint
+        run: npm run lint -- --max-warnings=0
 
+      # 3. TEST
       - name: Test
         run: npm run test
 
+      # 4. BUILD
       - name: Build application
         run: npm run build
