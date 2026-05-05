@@ -6,6 +6,8 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Service from "./pages/Services";
 import Barbers from "./pages/Barbers";
+import BookingHistory from "./pages/BookingHistory/BookingHistory";
+import ProtectedRoute from "./components/ProtectedRoute";
 function App() {
   return (
     <BrowserRouter>
@@ -15,6 +17,14 @@ function App() {
             <Route path="/" element={<Home />} />
             <Route path="/barbers" element={<Barbers />} />
             <Route path="/booking" element={<Service />} />
+            <Route
+              path="/booking-history"
+              element={
+                <ProtectedRoute>
+                  <BookingHistory />
+                </ProtectedRoute>
+              }
+            />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             {/* Add protected routes here if needed */}
