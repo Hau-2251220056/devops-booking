@@ -23,6 +23,7 @@ enum UserRole {
 enum BookingStatus {
   pending
   confirmed
+  cancellation_pending
   cancelled
   completed
 }

@@ -1,7 +1,10 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Header from "../../components/Header";
 import Footer from "../../components/Footer";
-import { cancelBooking, getMyBookings } from "../../services/bookingApi";
+import {
+  getMyBookings,
+  requestBookingCancellation,
+} from "../../services/bookingApi";
 import BookingCard from "./BookingCard";
 import "./BookingHistory.css";
 
@@ -39,6 +42,8 @@ const isPastDate = (dateString) => {
 };
 
 const canCancelBooking = (booking) => {
+  // User can only request cancellation for pending and confirmed bookings
+  // Cannot if already requested cancellation (cancellation_pending)
   const cancellableStatus = ["pending", "confirmed"];
   return (
     cancellableStatus.includes(booking?.status) && !isPastDate(booking?.date)
@@ -58,7 +63,10 @@ const filterBookingsByTab = (bookings, activeTab) => {
 
     if (activeTab === TABS.upcoming) {
       return (
-        isUpcomingDate && ["pending", "confirmed"].includes(booking?.status)
+        isUpcomingDate &&
+        ["pending", "confirmed", "cancellation_pending"].includes(
+          booking?.status,
+        )
       );
     }
 
@@ -68,7 +76,7 @@ const filterBookingsByTab = (bookings, activeTab) => {
     }
 
     if (activeTab === TABS.cancelled) {
-      return booking?.status === "cancelled";
+      return ["cancelled", "cancellation_pending"].includes(booking?.status);
     }
 
     return true;
@@ -125,22 +133,33 @@ function BookingHistory() {
   );
 
   const handleCancelBooking = async (bookingId) => {
+    const confirmCancel = window.confirm(
+      "Bạn có chắc muốn gửi yêu cầu hủy lịch hẹn này? Admin sẽ xem xét yêu cầu của bạn.",
+    );
+
+    if (!confirmCancel) return;
+
     setCancellingId(bookingId);
     setError("");
 
-    const response = await cancelBooking(bookingId);
+    const response = await requestBookingCancellation(
+      bookingId,
+      "User requested cancellation",
+    );
 
     if (!response.success) {
-      setError(response.message || "Không thể hủy lịch hẹn. Vui lòng thử lại.");
+      setError(
+        response.message || "Không thể gửi yêu cầu hủy. Vui lòng thử lại.",
+      );
       setCancellingId("");
       return;
     }
 
-    // Update local state to keep UI responsive without a full re-fetch.
+    // Update local state - status becomes cancellation_pending (waiting for admin approval)
     setBookings((prev) => {
       const nextBookings = prev.map((booking) =>
         booking.id === bookingId
-          ? { ...booking, status: "cancelled" }
+          ? { ...booking, status: "cancellation_pending" }
           : booking,
       );
       setFilteredBookings(

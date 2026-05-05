@@ -39,10 +39,18 @@ function Dashboard() {
 
   const cards = useMemo(
     () => [
-      { title: "Total Users", value: stats?.totalUsers ?? 0, tone: "blue" },
-      { title: "Total Bookings", value: stats?.totalBookings ?? 0, tone: "purple" },
+      { title: "Tổng Users", value: stats?.totalUsers ?? 0, tone: "blue" },
+      {
+        title: "Tổng Bookings",
+        value: stats?.totalBookings ?? 0,
+        tone: "purple",
+      },
       { title: "Pending Bookings", value: stats?.pending ?? 0, tone: "amber" },
-      { title: "Completed Bookings", value: stats?.completed ?? 0, tone: "green" },
+      {
+        title: "Completed Bookings",
+        value: stats?.completed ?? 0,
+        tone: "green",
+      },
     ],
     [stats],
   );

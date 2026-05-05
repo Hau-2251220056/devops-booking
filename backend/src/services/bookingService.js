@@ -352,7 +352,9 @@ const listMyBookings = async (userId) => {
 };
 
 const listAll = async (filters = {}) => {
-  const where = {};
+  const where = {
+    deletedAt: null, // Exclude soft-deleted bookings
+  };
 
   if (filters.status) where.status = filters.status;
   if (filters.barberId) where.barberId = filters.barberId;
@@ -457,6 +459,149 @@ const cancelBooking = async (id, currentUser, reason) => {
       cancelledAt: new Date(),
       cancelledBy: currentUser.id,
       cancellationReason: reason || `Cancelled by ${currentUser.role}`,
+      deletedAt: new Date(), // Soft delete: mark as deleted
+    },
+    include: {
+      customer: true,
+      barber: {
+        include: {
+          user: true,
+        },
+      },
+      branch: true,
+      bookingServices: {
+        include: {
+          service: true,
+        },
+      },
+    },
+  });
+
+  return serializeBooking(updated);
+};
+
+const requestCancellation = async (id, currentUser, reason) => {
+  const booking = await prisma.booking.findUnique({
+    where: { id },
+  });
+
+  if (!booking) {
+    throw new ApiError(404, "Booking not found");
+  }
+
+  // Only allow cancellation requests for pending and confirmed bookings
+  if (
+    !["pending", "confirmed", "cancellation_pending"].includes(booking.status)
+  ) {
+    throw new ApiError(
+      400,
+      `Cannot cancel booking with status: ${booking.status}`,
+    );
+  }
+
+  // Users can only cancel their own bookings
+  if (currentUser.role !== "admin" && booking.customerId !== currentUser.id) {
+    throw new ApiError(403, "You can only cancel your own booking");
+  }
+
+  const updated = await prisma.booking.update({
+    where: { id },
+    data: {
+      status: "cancellation_pending",
+      cancellationReason:
+        reason || `Cancellation requested by ${currentUser.role}`,
+      updatedAt: new Date(),
+    },
+    include: {
+      customer: true,
+      barber: {
+        include: {
+          user: true,
+        },
+      },
+      branch: true,
+      bookingServices: {
+        include: {
+          service: true,
+        },
+      },
+    },
+  });
+
+  return serializeBooking(updated);
+};
+
+const approveCancellation = async (id, currentUser) => {
+  const booking = await prisma.booking.findUnique({
+    where: { id },
+  });
+
+  if (!booking) {
+    throw new ApiError(404, "Booking not found");
+  }
+
+  if (booking.status !== "cancellation_pending") {
+    throw new ApiError(400, "Booking is not pending cancellation");
+  }
+
+  // Only admin can approve cancellation
+  if (currentUser.role !== "admin") {
+    throw new ApiError(403, "Only admin can approve cancellation");
+  }
+
+  const updated = await prisma.booking.update({
+    where: { id },
+    data: {
+      status: "cancelled",
+      cancelledAt: new Date(),
+      cancelledBy: currentUser.id,
+      deletedAt: new Date(), // Soft delete
+      updatedAt: new Date(),
+    },
+    include: {
+      customer: true,
+      barber: {
+        include: {
+          user: true,
+        },
+      },
+      branch: true,
+      bookingServices: {
+        include: {
+          service: true,
+        },
+      },
+    },
+  });
+
+  return serializeBooking(updated);
+};
+
+const rejectCancellation = async (id, currentUser) => {
+  const booking = await prisma.booking.findUnique({
+    where: { id },
+  });
+
+  if (!booking) {
+    throw new ApiError(404, "Booking not found");
+  }
+
+  if (booking.status !== "cancellation_pending") {
+    throw new ApiError(400, "Booking is not pending cancellation");
+  }
+
+  // Only admin can reject cancellation
+  if (currentUser.role !== "admin") {
+    throw new ApiError(403, "Only admin can reject cancellation");
+  }
+
+  // Revert back to confirmed
+  const updated = await prisma.booking.update({
+    where: { id },
+    data: {
+      status: "confirmed",
+      cancellationReason: null,
+      updatedAt: new Date(),
     },
     include: {
       customer: true,
@@ -484,5 +629,8 @@ module.exports = {
   listAll,
   updateStatus,
   cancelBooking,
+  requestCancellation,
+  approveCancellation,
+  rejectCancellation,
   serializeBooking,
 };

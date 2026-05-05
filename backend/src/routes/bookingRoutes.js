@@ -38,9 +38,33 @@ router.patch(
 router.delete(
   "/:id",
   authMiddleware,
+  adminMiddleware,
   idParamValidation,
   validateRequest,
   bookingController.remove,
+);
+router.post(
+  "/:id/request-cancellation",
+  authMiddleware,
+  idParamValidation,
+  validateRequest,
+  bookingController.requestCancellation,
+);
+router.patch(
+  "/:id/approve-cancellation",
+  authMiddleware,
+  adminMiddleware,
+  idParamValidation,
+  validateRequest,
+  bookingController.approveCancellation,
+);
+router.patch(
+  "/:id/reject-cancellation",
+  authMiddleware,
+  adminMiddleware,
+  idParamValidation,
+  validateRequest,
+  bookingController.rejectCancellation,
 );
 
 module.exports = router;

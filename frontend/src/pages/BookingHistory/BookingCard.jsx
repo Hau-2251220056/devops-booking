@@ -3,6 +3,10 @@ import "./BookingCard.css";
 const STATUS_META = {
   pending: { label: "Chờ xác nhận", className: "status-pending" },
   confirmed: { label: "Đã xác nhận", className: "status-confirmed" },
+  cancellation_pending: {
+    label: "Chờ phê duyệt hủy",
+    className: "status-cancellation-pending",
+  },
   completed: { label: "Hoàn thành", className: "status-completed" },
   cancelled: { label: "Đã hủy", className: "status-cancelled" },
 };

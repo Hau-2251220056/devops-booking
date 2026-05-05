@@ -198,4 +198,186 @@ export const cancelBooking = async (bookingId) => {
   }
 };
 
+/**
+ * Get all bookings (Admin only)
+ * @returns {Promise<{success: boolean, message: string, data: Array}>}
+ */
+export const getAllBookings = async () => {
+  try {
+    const response = await bookingApiClient.get("/bookings");
+    const payload = response.data;
+
+    const normalizeServiceName = (item) => {
+      if (item?.service?.name) {
+        return item.service.name;
+      }
+
+      if (
+        Array.isArray(item?.bookingServices) &&
+        item.bookingServices.length > 0
+      ) {
+        const serviceNames = item.bookingServices
+          .map((bookingService) => bookingService?.service?.name)
+          .filter(Boolean);
+
+        if (serviceNames.length > 0) {
+          return serviceNames.join(", ");
+        }
+      }
+
+      return "Chưa cập nhật";
+    };
+
+    const normalizeBookings = (rawBookings) =>
+      rawBookings.map((item) => ({
+        id: item?.id,
+        date: item?.bookingDate || "",
+        startTime: item?.startTime || "",
+        endTime: item?.endTime || "",
+        status: item?.status || "pending",
+        user: {
+          name:
+            item?.customer?.firstName && item?.customer?.lastName
+              ? `${item.customer.firstName} ${item.customer.lastName}`.trim()
+              : item?.customer?.username || "Chưa cập nhật",
+        },
+        service: {
+          name: normalizeServiceName(item),
+        },
+      }));
+
+    const bookings = Array.isArray(payload?.data) ? payload.data : [];
+
+    return {
+      success: Boolean(payload?.success ?? true),
+      message: payload?.message || "Success",
+      data: normalizeBookings(bookings),
+    };
+  } catch (error) {
+    const message =
+      error?.response?.data?.message || error?.message || "Unknown error";
+    return { success: false, message, data: [] };
+  }
+};
+
+/**
+ * Update booking status (Admin only)
+ * @param {string} bookingId
+ * @param {string} status - pending, confirmed, completed, cancelled
+ * @returns {Promise<{success: boolean, message: string, data?: Object}>}
+ */
+export const updateBookingStatus = async (bookingId, status) => {
+  try {
+    const response = await bookingApiClient.patch(
+      `/bookings/${bookingId}/status`,
+      {
+        status,
+      },
+    );
+    const payload = response.data;
+
+    return {
+      success: Boolean(payload?.success ?? true),
+      message: payload?.message || "Status updated successfully",
+      data: payload?.data,
+    };
+  } catch (error) {
+    const message =
+      error?.response?.data?.message || error?.message || "Unknown error";
+    return { success: false, message };
+  }
+};
+
+/**
+ * Delete booking (Admin)
+ * @param {string} bookingId
+ * @returns {Promise<{success: boolean, message: string}>}
+ */
+export const deleteBooking = async (bookingId) => {
+  try {
+    const response = await bookingApiClient.delete(`/bookings/${bookingId}`);
+    const payload = response.data;
+
+    return {
+      success: Boolean(payload?.success ?? true),
+      message: payload?.message || "Booking deleted successfully",
+    };
+  } catch (error) {
+    const message =
+      error?.response?.data?.message || error?.message || "Unknown error";
+    return { success: false, message };
+  }
+};
+
+/**
+ * Request cancellation (User or Admin)
+ * @param {string} bookingId
+ * @param {string} reason - Cancellation reason
+ * @returns {Promise<{success: boolean, message: string}>}
+ */
+export const requestBookingCancellation = async (bookingId, reason = "") => {
+  try {
+    const response = await bookingApiClient.post(
+      `/bookings/${bookingId}/request-cancellation`,
+      { reason },
+    );
+    const payload = response.data;
+
+    return {
+      success: Boolean(payload?.success ?? true),
+      message: payload?.message || "Cancellation request sent successfully",
+    };
+  } catch (error) {
+    const message =
+      error?.response?.data?.message || error?.message || "Unknown error";
+    return { success: false, message };
+  }
+};
+
+/**
+ * Approve cancellation (Admin only)
+ * @param {string} bookingId
+ * @returns {Promise<{success: boolean, message: string}>}
+ */
+export const approveBookingCancellation = async (bookingId) => {
+  try {
+    const response = await bookingApiClient.patch(
+      `/bookings/${bookingId}/approve-cancellation`,
+    );
+    const payload = response.data;
+
+    return {
+      success: Boolean(payload?.success ?? true),
+      message: payload?.message || "Cancellation approved successfully",
+    };
+  } catch (error) {
+    const message =
+      error?.response?.data?.message || error?.message || "Unknown error";
+    return { success: false, message };
+  }
+};
+
+/**
+ * Reject cancellation (Admin only)
+ * @param {string} bookingId
+ * @returns {Promise<{success: boolean, message: string}>}
+ */
+export const rejectBookingCancellation = async (bookingId) => {
+  try {
+    const response = await bookingApiClient.patch(
+      `/bookings/${bookingId}/reject-cancellation`,
+    );
+    const payload = response.data;
+
+    return {
+      success: Boolean(payload?.success ?? true),
+      message: payload?.message || "Cancellation rejected successfully",
+    };
+  } catch (error) {
+    const message =
+      error?.response?.data?.message || error?.message || "Unknown error";
+    return { success: false, message };
+  }
+};
+
 export default bookingApiClient;
