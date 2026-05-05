@@ -4,11 +4,25 @@ const availableSlotsValidation = [
   query("date")
     .matches(/^\d{4}-\d{2}-\d{2}$/)
     .withMessage("date must be YYYY-MM-DD"),
-  query("barberId").isUUID().withMessage("barberId is required"),
+  query("workerId").optional().isUUID().withMessage("workerId must be valid"),
+  query("barberId").optional().isUUID().withMessage("barberId must be valid"),
+  query().custom((_, { req }) => {
+    if (!req.query.workerId && !req.query.barberId) {
+      throw new Error("workerId is required");
+    }
+    return true;
+  }),
 ];
 
 const createBookingValidation = [
-  body("barberId").isUUID().withMessage("barberId is required"),
+  body("workerId").optional().isUUID().withMessage("workerId must be valid"),
+  body("barberId").optional().isUUID().withMessage("barberId must be valid"),
+  body().custom((_, { req }) => {
+    if (!req.body.workerId && !req.body.barberId) {
+      throw new Error("barberId is required");
+    }
+    return true;
+  }),
   body("bookingDate")
     .matches(/^\d{4}-\d{2}-\d{2}$/)
     .withMessage("bookingDate must be YYYY-MM-DD"),

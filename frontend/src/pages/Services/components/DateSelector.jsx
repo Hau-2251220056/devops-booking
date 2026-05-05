@@ -1,6 +1,13 @@
 import { formatDisplayDate } from "../../../utils/dateHelper";
 import "./DateSelector.css";
 
+const formatLocalDateKey = (date) => {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+};
+
 function DateSelector({ selectedDate, onSelectDate }) {
   const today = new Date();
   const dates = [];
@@ -20,10 +27,9 @@ function DateSelector({ selectedDate, onSelectDate }) {
 
       <div className="dates-grid">
         {dates.map((date) => {
-          const dateStr = date.toISOString().split("T")[0];
+          const dateStr = formatLocalDateKey(date);
           const isSelected =
-            selectedDate &&
-            selectedDate.toISOString().split("T")[0] === dateStr;
+            selectedDate && formatLocalDateKey(selectedDate) === dateStr;
 
           return (
             <button

@@ -29,7 +29,14 @@ export const createBooking = async (bookingData) => {
     return response.data;
   } catch (error) {
     console.error("Error creating booking:", error);
-    throw error;
+    // Normalize error to a predictable shape
+    const message =
+      error?.response?.data?.message ||
+      error?.response?.data?.error ||
+      error.message ||
+      "Unknown error";
+    const status = error?.response?.status || 500;
+    return { success: false, message, status };
   }
 };
 
@@ -40,13 +47,29 @@ export const createBooking = async (bookingData) => {
  */
 export const getAvailableSlots = async (date) => {
   try {
+    const params = typeof date === "string" ? { date } : date;
     const response = await bookingApiClient.get("/bookings/available-slots", {
-      params: date,
+      params,
     });
-    return response.data;
+    const payload = response.data;
+    if (Array.isArray(payload)) {
+      return { success: true, message: "Success", data: payload };
+    }
+
+    if (Array.isArray(payload?.data)) {
+      return payload;
+    }
+
+    return {
+      success: Boolean(payload?.success),
+      message: payload?.message || "Success",
+      data: payload?.data || [],
+    };
   } catch (error) {
     console.error("Error fetching available slots:", error);
-    throw error;
+    const message =
+      error?.response?.data?.message || error?.message || "Unknown error";
+    return { success: false, message, data: null };
   }
 };
 

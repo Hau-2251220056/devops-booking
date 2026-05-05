@@ -19,7 +19,7 @@
     "seed": "node prisma/seed.js",
 
     "lint": "echo \"no lint configured\"",
-    "test": "echo \"no test\""
+    "test": "node --test"
   },
   "keywords": [],
   "author": "",

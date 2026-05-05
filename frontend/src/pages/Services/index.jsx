@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useSearchParams } from "react-router-dom";
 import { AlertCircle, CheckCircle } from "lucide-react";
 import Header from "../../components/Header";
@@ -6,24 +6,25 @@ import Footer from "../../components/Footer";
 import BarberSelector from "./components/BarberSelector";
 import ServiceSelector from "./components/ServiceSelector";
 import DateSelector from "./components/DateSelector";
-import TimeSelector from "./components/TimeSelector";
+import BookingTimeSlots from "./components/BookingTimeSlots";
 import CustomerInfoForm from "./components/CustomerInfoForm";
 import BookingSummary from "./components/BookingSummary";
 import { fetchServices } from "../../services/serviceApi";
 import { fetchBarbers } from "../../services/barberApi";
 import { createBooking } from "../../services/bookingApi";
-import { getAvailableSlots } from "../../services/bookingApi";
 import { validateBookingForm } from "../../utils/validation";
+import { useToast } from "../../components/Toast/useToast";
+import { useAuth } from "../../contexts/useAuth";
 import { formatDateForApi } from "../../utils/dateHelper";
 import "./Booking.css";
 
 function BookingPage() {
+  const { user } = useAuth();
   const [searchParams] = useSearchParams();
   const barberIdFromUrl = searchParams.get("barberId");
 
   const [services, setServices] = useState([]);
   const [barbers, setBarbers] = useState([]);
-  const [availableSlots, setAvailableSlots] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -32,6 +33,7 @@ function BookingPage() {
   const [selectedService, setSelectedService] = useState(null);
   const [selectedDate, setSelectedDate] = useState(null);
   const [selectedTime, setSelectedTime] = useState("");
+  const [selectedSlot, setSelectedSlot] = useState(null);
   const [customerInfo, setCustomerInfo] = useState({
     fullName: "",
     phone: "",
@@ -42,6 +44,62 @@ function BookingPage() {
   const [formErrors, setFormErrors] = useState({});
   const [submitStatus, setSubmitStatus] = useState(null); // null, 'success', 'error'
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [slotReloadKey, setSlotReloadKey] = useState(0);
+
+  const filteredServices = useMemo(() => {
+    if (!selectedBarber?.branchId) {
+      return services;
+    }
+
+    return services.filter(
+      (service) => service.branchId === selectedBarber.branchId,
+    );
+  }, [services, selectedBarber]);
+
+  const suggestedCustomerInfo = useMemo(() => {
+    if (!user) {
+      return { fullName: "", phone: "" };
+    }
+
+    const fullName = [user.firstName, user.lastName]
+      .filter(Boolean)
+      .join(" ")
+      .trim();
+
+    return {
+      fullName,
+      phone: user.phone || "",
+    };
+  }, [user]);
+
+  const effectiveCustomerInfo = useMemo(
+    () => ({
+      fullName: customerInfo.fullName || suggestedCustomerInfo.fullName,
+      phone: customerInfo.phone || suggestedCustomerInfo.phone,
+      note: customerInfo.note,
+    }),
+    [customerInfo, suggestedCustomerInfo],
+  );
+
+  const isFormReadyForSubmit = useMemo(
+    () =>
+      Boolean(
+        selectedBarber &&
+        selectedService &&
+        selectedDate &&
+        selectedSlot &&
+        effectiveCustomerInfo.fullName?.trim() &&
+        effectiveCustomerInfo.phone?.trim(),
+      ),
+    [
+      effectiveCustomerInfo.fullName,
+      effectiveCustomerInfo.phone,
+      selectedBarber,
+      selectedDate,
+      selectedService,
+      selectedSlot,
+    ],
+  );
 
   const addMinutesToTime = (time, minutes) => {
     const [hours, mins] = time.split(":").map(Number);
@@ -72,9 +130,12 @@ function BookingPage() {
         }
 
         const defaultBarber =
-          (barbersResponse.success && barbersResponse.data?.find(
-            (barber) => barber.id === barberIdFromUrl,
-          )) || barbersResponse.data?.[0] || null;
+          (barbersResponse.success &&
+            barbersResponse.data?.find(
+              (barber) => barber.id === barberIdFromUrl,
+            )) ||
+          barbersResponse.data?.[0] ||
+          null;
 
         setSelectedBarber(defaultBarber);
       } catch (err) {
@@ -88,33 +149,16 @@ function BookingPage() {
     loadData();
   }, [barberIdFromUrl]);
 
-  useEffect(() => {
-    const loadAvailableSlots = async () => {
-      if (!selectedBarber || !selectedDate) {
-        setAvailableSlots([]);
-        return;
-      }
-
-      try {
-        const response = await getAvailableSlots({
-          date: formatDateForApi(selectedDate),
-          barberId: selectedBarber.id,
-        });
-
-        setAvailableSlots(response?.data?.availableSlots || []);
-      } catch (slotError) {
-        console.error("Error loading available slots:", slotError);
-        setAvailableSlots([]);
-      }
-    };
-
-    loadAvailableSlots();
-  }, [selectedBarber, selectedDate]);
-
   const handleSelectBarber = (barber) => {
     setSelectedBarber(barber);
     setFormErrors((prev) => ({ ...prev, barber: "" }));
+    setSelectedService((currentService) =>
+      currentService && currentService.branchId === barber.branchId
+        ? currentService
+        : null,
+    );
     setSelectedTime("");
+    setSelectedSlot(null);
   };
 
   const handleSelectService = (service) => {
@@ -125,10 +169,13 @@ function BookingPage() {
   const handleSelectDate = (date) => {
     setSelectedDate(date);
     setFormErrors((prev) => ({ ...prev, date: "" }));
+    setSelectedTime("");
+    setSelectedSlot(null);
   };
 
   const handleSelectTime = (time) => {
-    setSelectedTime(time);
+    setSelectedTime(time?.start || "");
+    setSelectedSlot(time);
     setFormErrors((prev) => ({ ...prev, time: "" }));
   };
 
@@ -141,6 +188,12 @@ function BookingPage() {
     }));
   };
 
+  const toast = useToast();
+
+  const handleFieldFocus = (fieldName) => {
+    setFormErrors((prev) => ({ ...prev, [fieldName]: "" }));
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -150,7 +203,7 @@ function BookingPage() {
       selectedService,
       selectedDate,
       selectedTime,
-      customerInfo,
+      customerInfo: effectiveCustomerInfo,
     };
 
     const validation = validateBookingForm(formData);
@@ -167,9 +220,27 @@ function BookingPage() {
       setIsSubmitting(true);
       setFormErrors({});
 
+      if (
+        !selectedService ||
+        selectedService.branchId !== selectedBarber?.branchId
+      ) {
+        setSubmitStatus("error");
+        toast.error("Vui lòng chọn dịch vụ thuộc đúng chi nhánh của thợ.");
+        setFormErrors((prev) => ({
+          ...prev,
+          service: "Vui lòng chọn dịch vụ thuộc đúng chi nhánh của thợ",
+        }));
+        return;
+      }
+
       const durationMinutes =
-        selectedService.durationMinutes || selectedService.duration || 0;
-      const endTime = addMinutesToTime(selectedTime, durationMinutes);
+        selectedSlot?.durationMinutes ||
+        selectedService.durationMinutes ||
+        selectedService.duration ||
+        0;
+      const endTime =
+        selectedSlot?.endTime ||
+        addMinutesToTime(selectedTime, durationMinutes);
 
       // Prepare booking data for API
       const bookingData = {
@@ -178,7 +249,7 @@ function BookingPage() {
         startTime: selectedTime,
         endTime,
         serviceIds: [selectedService.id],
-        notes: customerInfo.note.trim(),
+        notes: effectiveCustomerInfo.note.trim(),
       };
 
       // Log booking data to console
@@ -186,14 +257,15 @@ function BookingPage() {
 
       // Call API
       const response = await createBooking(bookingData);
-
       if (response.success) {
         setSubmitStatus("success");
+        toast.success("Đặt lịch thành công! Chúng tôi đã gửi xác nhận.");
         // Reset form after success
         setTimeout(() => {
           setSelectedService(null);
           setSelectedDate(null);
           setSelectedTime("");
+          setSelectedSlot(null);
           setSelectedBarber(barbers[0] || null);
           setCustomerInfo({
             fullName: "",
@@ -203,11 +275,28 @@ function BookingPage() {
           setSubmitStatus(null);
         }, 2000);
       } else {
+        // Handle known conflict / not available errors gracefully
         setSubmitStatus("error");
+        const msg = response.message || "Không thể đặt lịch. Vui lòng thử lại.";
+        // If slot not available, show inline error and refresh available slots
+        if (
+          response.status === 400 &&
+          /not available|not available|không khả dụng/i.test(msg)
+        ) {
+          setFormErrors((prev) => ({ ...prev, time: msg }));
+          toast.error(msg);
+          setSlotReloadKey((prev) => prev + 1);
+          // clear selected time so user must reselect
+          setSelectedTime("");
+          setSelectedSlot(null);
+        } else {
+          toast.error(msg);
+        }
       }
     } catch (err) {
       console.error("Error submitting booking:", err);
       setSubmitStatus("error");
+      toast.error("Có lỗi khi gửi yêu cầu đặt lịch. Vui lòng thử lại.");
     } finally {
       setIsSubmitting(false);
     }
@@ -296,7 +385,7 @@ function BookingPage() {
                 />
 
                 <ServiceSelector
-                  services={services}
+                  services={filteredServices}
                   selectedService={selectedService}
                   onSelectService={handleSelectService}
                 />
@@ -306,16 +395,19 @@ function BookingPage() {
                   onSelectDate={handleSelectDate}
                 />
 
-                <TimeSelector
-                  selectedTime={selectedTime}
-                  onSelectTime={handleSelectTime}
-                  disabledSlots={availableSlots.map((slot) => slot.startTime)}
+                <BookingTimeSlots
+                  selectedDate={selectedDate}
+                  workerId={selectedBarber?.id}
+                  selectedSlot={selectedSlot}
+                  onSelectSlot={handleSelectTime}
+                  reloadKey={slotReloadKey}
                 />
 
                 <CustomerInfoForm
-                  customerInfo={customerInfo}
+                  customerInfo={effectiveCustomerInfo}
                   onUpdateCustomerInfo={handleUpdateCustomerInfo}
                   errors={formErrors}
+                  onFieldFocus={handleFieldFocus}
                 />
 
                 {/* Submit Button */}
@@ -323,7 +415,7 @@ function BookingPage() {
                   <button
                     type="submit"
                     className="btn-submit"
-                    disabled={isSubmitting}
+                    disabled={isSubmitting || !isFormReadyForSubmit}
                   >
                     {isSubmitting ? "Đang xử lý..." : "Xác nhận đặt lịch"}
                   </button>
@@ -337,7 +429,8 @@ function BookingPage() {
                   selectedService={selectedService}
                   selectedDate={selectedDate}
                   selectedTime={selectedTime}
-                  customerInfo={customerInfo}
+                  selectedSlot={selectedSlot}
+                  customerInfo={effectiveCustomerInfo}
                 />
               </aside>
             </div>

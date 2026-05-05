@@ -1,6 +1,11 @@
 import "./CustomerInfoForm.css";
 
-function CustomerInfoForm({ customerInfo, onUpdateCustomerInfo, errors }) {
+function CustomerInfoForm({
+  customerInfo,
+  onUpdateCustomerInfo,
+  errors,
+  onFieldFocus,
+}) {
   const handleChange = (e) => {
     const { name, value } = e.target;
     onUpdateCustomerInfo({
@@ -28,6 +33,7 @@ function CustomerInfoForm({ customerInfo, onUpdateCustomerInfo, errors }) {
           placeholder="Nhập tên của bạn"
           value={customerInfo.fullName}
           onChange={handleChange}
+          onFocus={() => onFieldFocus && onFieldFocus("fullName")}
         />
         {errors.fullName && (
           <span className="error-message">{errors.fullName}</span>
@@ -46,6 +52,7 @@ function CustomerInfoForm({ customerInfo, onUpdateCustomerInfo, errors }) {
           placeholder="0Dxx xxx xxx"
           value={customerInfo.phone}
           onChange={handleChange}
+          onFocus={() => onFieldFocus && onFieldFocus("phone")}
         />
         {errors.phone && <span className="error-message">{errors.phone}</span>}
       </div>
@@ -61,6 +68,7 @@ function CustomerInfoForm({ customerInfo, onUpdateCustomerInfo, errors }) {
           placeholder="Yêu cầu đặc biệt cho thợ cắt tóc..."
           value={customerInfo.note}
           onChange={handleChange}
+          onFocus={() => onFieldFocus && onFieldFocus("note")}
           rows="4"
         />
       </div>
