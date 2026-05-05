@@ -10,6 +10,9 @@ import BookingHistory from "./pages/BookingHistory/BookingHistory";
 import ProtectedRoute from "./components/ProtectedRoute";
 import RoleRoute from "./components/RoleRoute";
 import AdminLayout from "./components/AdminLayout";
+import Dashboard from "./pages/Admin/Dashboard";
+import Users from "./pages/Admin/Users";
+import AdminBookings from "./pages/Admin/Bookings";
 import { useAuth } from "./contexts/useAuth";
 
 function HomeRoute() {
@@ -50,7 +53,11 @@ function App() {
                   <AdminLayout />
                 </RoleRoute>
               }
-            />
+            >
+              <Route index element={<Dashboard />} />
+              <Route path="bookings" element={<AdminBookings />} />
+              <Route path="users" element={<Users />} />
+            </Route>
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             {/* Add protected routes here if needed */}
