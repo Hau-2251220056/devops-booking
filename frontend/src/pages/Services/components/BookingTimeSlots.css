@@ -1,3 +1,41 @@
+.booking-time-slots {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.time-slot-state {
+  margin: 0;
+  font-size: 0.95rem;
+  color: #6b7280;
+}
+
+.time-slot-state.error {
+  color: #dc2626;
+}
+
+.time-slot-state.empty {
+  color: #9ca3af;
+}
+
+.time-slots-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+  gap: 0.75rem;
+}
+
+.time-slots-skeleton {
+  pointer-events: none;
+}
+
+.time-slot-skeleton {
+  min-height: 2.75rem;
+  border-radius: 0.75rem;
+  background: linear-gradient(90deg, #e5e7eb 25%, #f3f4f6 50%, #e5e7eb 75%);
+  background-size: 200% 100%;
+  animation: slot-shimmer 1.2s linear infinite;
+}
+
 .time-slot {
   padding: 0.875rem 1rem;
   border: 2px solid #e5e7eb;
@@ -38,13 +76,21 @@
   transform: scale(0.95);
 }
 
-.time-slot-empty {
-  margin: 0;
-  color: #6b7280;
-  font-size: 0.9rem;
+@keyframes slot-shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+
+  100% {
+    background-position: -200% 0;
+  }
 }
 
 @media (max-width: 768px) {
+  .time-slots-grid {
+    grid-template-columns: repeat(auto-fill, minmax(92px, 1fr));
+  }
+
   .time-slot {
     padding: 0.75rem 0.5rem;
     font-size: 0.8rem;

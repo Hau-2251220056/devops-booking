@@ -7,6 +7,7 @@ function BookingSummary({
   selectedService,
   selectedDate,
   selectedTime,
+  selectedSlot,
   customerInfo,
 }) {
   return (
@@ -23,7 +24,8 @@ function BookingSummary({
             <div className="summary-value">
               <p className="service-name">{selectedService.name}</p>
               <p className="service-duration">
-                {selectedService.duration} phút
+                {selectedService.durationMinutes || selectedService.duration}{" "}
+                phút
               </p>
             </div>
           ) : (
@@ -40,7 +42,8 @@ function BookingSummary({
           {selectedBarber ? (
             <div className="summary-value">
               <p className="service-name">
-                {selectedBarber?.user?.firstName || "Barber"} {selectedBarber?.user?.lastName || ""}
+                {selectedBarber?.user?.firstName || "Barber"}{" "}
+                {selectedBarber?.user?.lastName || ""}
               </p>
               <p className="service-duration">
                 {selectedBarber.specialization || "Thợ cắt tóc chuyên nghiệp"}
@@ -71,7 +74,11 @@ function BookingSummary({
             <span className="item-label">Giờ</span>
           </div>
           {selectedTime ? (
-            <p className="summary-value">{selectedTime}</p>
+            <p className="summary-value">
+              {selectedSlot
+                ? `${selectedSlot.start || selectedSlot.startTime} - ${selectedSlot.end || selectedSlot.endTime}`
+                : selectedTime}
+            </p>
           ) : (
             <p className="summary-empty">Chưa chọn</p>
           )}

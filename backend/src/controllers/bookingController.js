@@ -5,7 +5,7 @@ const bookingService = require("../services/bookingService");
 
 const getAvailableSlots = asyncHandler(async (req, res) => {
   const result = await bookingService.getAvailableSlots(req.query);
-  return sendSuccess(res, "Success", result);
+  return res.json(result);
 });
 
 const create = asyncHandler(async (req, res) => {

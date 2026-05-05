@@ -40,7 +40,11 @@ export const formatDisplayDate = (date) => {
  * Format date to ISO format for API
  */
 export const formatDateForApi = (date) => {
-  return date.toISOString().split("T")[0];
+  const localDate = date instanceof Date ? date : new Date(date);
+  const year = localDate.getFullYear();
+  const month = String(localDate.getMonth() + 1).padStart(2, "0");
+  const day = String(localDate.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
 };
 
 /**

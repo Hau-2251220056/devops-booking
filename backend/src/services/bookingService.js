@@ -8,6 +8,58 @@ const {
   parseTimeOnly,
   timeToMinutes,
 } = require("../utils/date");
+const {
+  generateTimeSlots,
+  SLOT_INTERVAL_MINUTES,
+} = require("../utils/generateTimeSlots");
+
+const BOOKABLE_STATUSES = ["pending", "confirmed"];
+
+const getNowInHoChiMinh = () => {
+  const now = new Date();
+  const parts = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Asia/Ho_Chi_Minh",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    hourCycle: "h23",
+  })
+    .formatToParts(now)
+    .reduce((acc, part) => {
+      if (part.type !== "literal") {
+        acc[part.type] = part.value;
+      }
+      return acc;
+    }, {});
+
+  return {
+    date: `${parts.year}-${parts.month}-${parts.day}`,
+    minutes: Number(parts.hour) * 60 + Number(parts.minute),
+  };
+};
+
+const isOverlap = (startTime, endTime, existingStart, existingEnd) => {
+  const startMinutes = timeToMinutes(startTime);
+  const endMinutes = timeToMinutes(endTime);
+  const existingStartMinutes = timeToMinutes(existingStart);
+  const existingEndMinutes = timeToMinutes(existingEnd);
+
+  if (
+    startMinutes === null ||
+    endMinutes === null ||
+    existingStartMinutes === null ||
+    existingEndMinutes === null
+  ) {
+    return false;
+  }
+
+  return startMinutes < existingEndMinutes && endMinutes > existingStartMinutes;
+};
+
+const normalizeWorkerId = (payload = {}) =>
+  payload.workerId || payload.barberId;
 
 const serializeBookingService = (item) => ({
   id: item.id,
@@ -83,14 +135,19 @@ const serializeBooking = (booking) => ({
     : [],
 });
 
-const getAvailableSlots = async ({ date, barberId }) => {
+const getAvailableSlots = async ({ date, workerId, barberId }) => {
   const bookingDate = parseDateOnly(date);
   if (!bookingDate) {
     throw new ApiError(400, "Invalid date");
   }
 
+  const resolvedBarberId = normalizeWorkerId({ workerId, barberId });
+  if (!resolvedBarberId) {
+    throw new ApiError(400, "workerId is required");
+  }
+
   const barber = await prisma.barber.findFirst({
-    where: { id: barberId, deletedAt: null, isActive: true },
+    where: { id: resolvedBarberId, deletedAt: null, isActive: true },
     include: { branch: true },
   });
 
@@ -98,21 +155,11 @@ const getAvailableSlots = async ({ date, barberId }) => {
     throw new ApiError(404, "Barber not found");
   }
 
-  const timeSlots = await prisma.timeSlot.findMany({
-    where: {
-      branchId: barber.branchId,
-      isActive: true,
-    },
-    orderBy: { startTime: "asc" },
-  });
-
   const bookings = await prisma.booking.findMany({
     where: {
-      barberId,
+      barberId: resolvedBarberId,
       bookingDate,
-      status: {
-        in: ["pending", "confirmed", "completed"],
-      },
+      status: { in: BOOKABLE_STATUSES },
     },
     select: {
       startTime: true,
@@ -120,56 +167,60 @@ const getAvailableSlots = async ({ date, barberId }) => {
     },
   });
 
-  const bookedSlotMap = new Set(
-    bookings.map(
-      (item) =>
-        `${formatTimeOnly(item.startTime)}-${formatTimeOnly(item.endTime)}`,
-    ),
-  );
+  const generatedSlots = generateTimeSlots({
+    date: bookingDate,
+    existingBookings: bookings.map((booking) => ({
+      startTime: formatTimeOnly(booking.startTime),
+      endTime: formatTimeOnly(booking.endTime),
+    })),
+  });
 
-  return {
-    date: formatDateOnly(bookingDate),
-    barber: {
-      id: barber.id,
-      branchId: barber.branchId,
-      branch: barber.branch,
-    },
-    availableSlots: timeSlots
-      .filter(
-        (slot) =>
-          !bookedSlotMap.has(
-            `${formatTimeOnly(slot.startTime)}-${formatTimeOnly(slot.endTime)}`,
-          ),
-      )
-      .map((slot) => ({
-        id: slot.id,
-        startTime: formatTimeOnly(slot.startTime),
-        endTime: formatTimeOnly(slot.endTime),
-        durationMinutes: slot.durationMinutes,
-        isActive: slot.isActive,
-      })),
-  };
+  return generatedSlots.map((slot) => ({
+    start: slot.start,
+    end: slot.end,
+    available: slot.available,
+  }));
 };
 
 const createBooking = async (payload, customerId) => {
   const bookingDate = parseDateOnly(payload.bookingDate);
   const startTime = parseTimeOnly(payload.startTime);
   const endTime = parseTimeOnly(payload.endTime);
+  const resolvedBarberId = normalizeWorkerId(payload);
 
   if (!bookingDate || !startTime || !endTime) {
     throw new ApiError(400, "Invalid booking date or time");
+  }
+
+  if (!resolvedBarberId) {
+    throw new ApiError(400, "barberId is required");
   }
 
   if (timeToMinutes(startTime) >= timeToMinutes(endTime)) {
     throw new ApiError(400, "startTime must be earlier than endTime");
   }
 
+  if (
+    timeToMinutes(endTime) - timeToMinutes(startTime) !==
+    SLOT_INTERVAL_MINUTES
+  ) {
+    throw new ApiError(400, "Selected slot must be 30 minutes");
+  }
+
   if (isPastDateOnly(bookingDate)) {
     throw new ApiError(400, "Cannot book a past date");
   }
 
+  const nowLocal = getNowInHoChiMinh();
+  const targetDate = formatDateOnly(bookingDate);
+  const startMinutes = timeToMinutes(startTime);
+
+  if (targetDate === nowLocal.date && startMinutes < nowLocal.minutes + 30) {
+    throw new ApiError(400, "Bookings must be at least 30 minutes in advance");
+  }
+
   const barber = await prisma.barber.findFirst({
-    where: { id: payload.barberId, deletedAt: null, isActive: true },
+    where: { id: resolvedBarberId, deletedAt: null, isActive: true },
     include: { branch: true },
   });
 
@@ -193,74 +244,85 @@ const createBooking = async (payload, customerId) => {
     );
   }
 
-  const matchingSlot = await prisma.timeSlot.findFirst({
-    where: {
-      branchId: barber.branchId,
-      isActive: true,
-      startTime,
-      endTime,
-    },
-  });
-
-  if (!matchingSlot) {
-    throw new ApiError(400, "Selected time slot is not available");
-  }
-
-  const existingBooking = await prisma.booking.findFirst({
-    where: {
-      barberId: payload.barberId,
-      bookingDate,
-      startTime,
-      endTime,
-      status: {
-        in: ["pending", "confirmed", "completed"],
-      },
-    },
-  });
-
-  if (existingBooking) {
-    throw new ApiError(409, "This time slot is already booked");
-  }
-
   const totalAmount = services.reduce(
     (sum, service) => sum + Number(service.price),
     0,
   );
 
-  const booking = await prisma.booking.create({
-    data: {
-      customerId,
-      barberId: payload.barberId,
-      branchId: barber.branchId,
-      bookingDate,
-      startTime,
-      endTime,
-      totalAmount,
-      notes: payload.notes,
-      status: "pending",
-      bookingServices: {
-        create: services.map((service) => ({
-          serviceId: service.id,
-          quantity: 1,
-          unitPrice: service.price,
-          subtotal: service.price,
-        })),
+  const booking = await prisma.$transaction(async (tx) => {
+    const overlappingBookings = await tx.booking.findMany({
+      where: {
+        barberId: resolvedBarberId,
+        bookingDate,
+        status: { in: BOOKABLE_STATUSES },
       },
-    },
-    include: {
-      customer: true,
-      barber: {
-        include: {
-          user: true,
+      select: {
+        startTime: true,
+        endTime: true,
+      },
+    });
+
+    const hasOverlap = overlappingBookings.some((bookingItem) =>
+      isOverlap(
+        formatTimeOnly(startTime),
+        formatTimeOnly(endTime),
+        formatTimeOnly(bookingItem.startTime),
+        formatTimeOnly(bookingItem.endTime),
+      ),
+    );
+
+    if (hasOverlap) {
+      throw new ApiError(409, "Selected time slot is already booked");
+    }
+
+    const slotExists = generateTimeSlots({
+      date: bookingDate,
+      existingBookings: [],
+    }).some(
+      (slot) =>
+        slot.start === formatTimeOnly(startTime) &&
+        slot.end === formatTimeOnly(endTime),
+    );
+
+    if (!slotExists) {
+      throw new ApiError(400, "Selected time slot is not available");
+    }
+
+    return tx.booking.create({
+      data: {
+        customerId,
+        barberId: resolvedBarberId,
+        branchId: barber.branchId,
+        bookingDate,
+        startTime,
+        endTime,
+        totalAmount,
+        notes: payload.notes,
+        status: "pending",
+        bookingServices: {
+          create: services.map((service) => ({
+            serviceId: service.id,
+            quantity: 1,
+            unitPrice: service.price,
+            subtotal: service.price,
+          })),
         },
       },
-      branch: true,
-      bookingServices: {
-        include: {
-          service: true,
+      include: {
+        customer: true,
+        barber: {
+          include: {
+            user: true,
+          },
+        },
+        branch: true,
+        bookingServices: {
+          include: {
+            service: true,
+          },
         },
       },
-    },
+    });
   });
 
   return serializeBooking(booking);

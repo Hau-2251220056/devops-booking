@@ -1,16 +1,7 @@
 import "./TimeSelector.css";
 
-function TimeSelector({ selectedTime, onSelectTime, disabledSlots }) {
-  const timeSlots = [
-    "09:00",
-    "09:45",
-    "10:30",
-    "11:15",
-    "14:00",
-    "14:45",
-    "15:30",
-    "16:15",
-  ];
+function TimeSelector({ selectedTime, onSelectTime, availableSlots }) {
+  const timeSlots = availableSlots || [];
 
   return (
     <div className="booking-section">
@@ -20,23 +11,24 @@ function TimeSelector({ selectedTime, onSelectTime, disabledSlots }) {
       </h2>
 
       <div className="time-slots-grid">
-        {timeSlots.map((time) => {
-          const isDisabled = disabledSlots?.includes(time);
-          const isSelected = selectedTime === time;
+        {timeSlots.length > 0 ? (
+          timeSlots.map((slot) => {
+            const isSelected = selectedTime === slot.startTime;
 
-          return (
-            <button
-              key={time}
-              className={`time-slot ${isSelected ? "selected" : ""} ${isDisabled ? "disabled" : ""
-                }`}
-              onClick={() => !isDisabled && onSelectTime(time)}
-              disabled={isDisabled}
-              type="button"
-            >
-              {time}
-            </button>
-          );
-        })}
+            return (
+              <button
+                key={`${slot.startTime}-${slot.endTime}`}
+                className={`time-slot ${isSelected ? "selected" : ""}`}
+                onClick={() => onSelectTime(slot)}
+                type="button"
+              >
+                {slot.startTime} - {slot.endTime}
+              </button>
+            );
+          })
+        ) : (
+          <p className="time-slot-empty">Không có khung giờ phù hợp</p>
+        )}
       </div>
     </div>
   );
