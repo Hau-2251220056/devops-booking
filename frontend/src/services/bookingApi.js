@@ -104,7 +104,10 @@ export const getMyBookings = async () => {
         return item.service.name;
       }
 
-      if (Array.isArray(item?.bookingServices) && item.bookingServices.length > 0) {
+      if (
+        Array.isArray(item?.bookingServices) &&
+        item.bookingServices.length > 0
+      ) {
         const serviceNames = item.bookingServices
           .map((bookingService) => bookingService?.service?.name)
           .filter(Boolean);

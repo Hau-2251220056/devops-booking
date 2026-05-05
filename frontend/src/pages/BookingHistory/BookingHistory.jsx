@@ -40,7 +40,9 @@ const isPastDate = (dateString) => {
 
 const canCancelBooking = (booking) => {
   const cancellableStatus = ["pending", "confirmed"];
-  return cancellableStatus.includes(booking?.status) && !isPastDate(booking?.date);
+  return (
+    cancellableStatus.includes(booking?.status) && !isPastDate(booking?.date)
+  );
 };
 
 const filterBookingsByTab = (bookings, activeTab) => {
@@ -55,7 +57,9 @@ const filterBookingsByTab = (bookings, activeTab) => {
     const isUpcomingDate = bookingDate ? bookingDate >= todayStart : false;
 
     if (activeTab === TABS.upcoming) {
-      return isUpcomingDate && ["pending", "confirmed"].includes(booking?.status);
+      return (
+        isUpcomingDate && ["pending", "confirmed"].includes(booking?.status)
+      );
     }
 
     if (activeTab === TABS.completed) {
@@ -92,7 +96,9 @@ function BookingHistory() {
     if (response.success) {
       const nextBookings = Array.isArray(response.data) ? response.data : [];
       setBookings(nextBookings);
-      setFilteredBookings(filterBookingsByTab(nextBookings, activeTabRef.current));
+      setFilteredBookings(
+        filterBookingsByTab(nextBookings, activeTabRef.current),
+      );
     } else {
       setError(response.message || "Không thể tải lịch sử lịch hẹn.");
       setBookings([]);
@@ -133,7 +139,9 @@ function BookingHistory() {
     // Update local state to keep UI responsive without a full re-fetch.
     setBookings((prev) => {
       const nextBookings = prev.map((booking) =>
-        booking.id === bookingId ? { ...booking, status: "cancelled" } : booking,
+        booking.id === bookingId
+          ? { ...booking, status: "cancelled" }
+          : booking,
       );
       setFilteredBookings(
         filterBookingsByTab(nextBookings, activeTabRef.current),
@@ -160,7 +168,10 @@ function BookingHistory() {
             <p>Theo dõi tất cả lịch hẹn và trạng thái của bạn tại đây.</p>
           </header>
 
-          <section className="booking-history-tabs" aria-label="Booking filters">
+          <section
+            className="booking-history-tabs"
+            aria-label="Booking filters"
+          >
             {tabEntries.map((tab) => (
               <button
                 key={tab.key}

@@ -59,7 +59,9 @@ function Header() {
             <div className="user-menu">
               <div className="user-info">
                 <FaUser className="user-icon" />
-                <span className="user-name">{user.firstName || user.username}</span>
+                <span className="user-name">
+                  {user.firstName || user.username}
+                </span>
               </div>
               <button
                 className="btn header-logout"
