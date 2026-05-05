@@ -1,21 +1,25 @@
-import { useMemo, useState } from "react";
-import { FaClipboardList, FaSignOutAlt, FaTachometerAlt, FaUsers } from "react-icons/fa";
-import { useNavigate } from "react-router-dom";
+import { useMemo } from "react";
+import {
+  FaClipboardList,
+  FaSignOutAlt,
+  FaTachometerAlt,
+  FaUsers,
+} from "react-icons/fa";
+import { NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/useAuth";
 import { logout as apiLogout } from "../../services/authApi";
-import Dashboard from "../../pages/Admin/Dashboard";
 import "../../pages/Admin/Dashboard/Dashboard.css";
 
 const MENU_ITEMS = [
-  { key: "dashboard", label: "Dashboard", icon: FaTachometerAlt },
-  { key: "bookings", label: "Bookings", icon: FaClipboardList },
-  { key: "users", label: "Users", icon: FaUsers },
+  { key: "dashboard", label: "Dashboard", icon: FaTachometerAlt, to: "/admin" },
+  { key: "bookings", label: "Bookings", icon: FaClipboardList, to: "/admin/bookings" },
+  { key: "users", label: "Users", icon: FaUsers, to: "/admin/users" },
 ];
 
 function AdminLayout() {
   const navigate = useNavigate();
   const { user, logout } = useAuth();
-  const [activeMenu, setActiveMenu] = useState("dashboard");
+  const { pathname } = useLocation();
 
   const adminName = useMemo(() => {
     return (
@@ -25,26 +29,31 @@ function AdminLayout() {
     );
   }, [user]);
 
+  const pageMeta = useMemo(() => {
+    if (pathname.startsWith("/admin/users")) {
+      return {
+        title: "User Management",
+        subtitle: "Quản lý tài khoản người dùng trong hệ thống booking",
+      };
+    }
+
+    if (pathname.startsWith("/admin/bookings")) {
+      return {
+        title: "Booking Management",
+        subtitle: "Quản lý lịch hẹn và trạng thái booking",
+      };
+    }
+
+    return {
+      title: "Admin Dashboard",
+      subtitle: "Quản lý tổng quan hệ thống booking",
+    };
+  }, [pathname]);
+
   const handleLogout = () => {
     apiLogout();
     logout();
     navigate("/login", { replace: true });
-  };
-
-  const renderContent = () => {
-    if (activeMenu === "dashboard") {
-      return <Dashboard />;
-    }
-
-    return (
-      <div className="dashboard-state">
-        <p>
-          {activeMenu === "bookings"
-            ? "Trang quản lý bookings sẽ được phát triển tiếp theo."
-            : "Trang quản lý users sẽ được phát triển tiếp theo."}
-        </p>
-      </div>
-    );
   };
 
   return (
@@ -63,15 +72,17 @@ function AdminLayout() {
             const Icon = item.icon;
 
             return (
-              <button
+              <NavLink
                 key={item.key}
-                type="button"
-                className={`admin-nav-item ${activeMenu === item.key ? "active" : ""}`}
-                onClick={() => setActiveMenu(item.key)}
+                to={item.to}
+                end={item.key === "dashboard"}
+                className={({ isActive }) =>
+                  `admin-nav-item ${isActive ? "active" : ""}`
+                }
               >
                 <Icon />
                 <span>{item.label}</span>
-              </button>
+              </NavLink>
             );
           })}
         </nav>
@@ -80,8 +91,8 @@ function AdminLayout() {
       <div className="admin-main">
         <header className="admin-header">
           <div>
-            <h1>Admin Dashboard</h1>
-            <p>Quản lý tổng quan hệ thống booking</p>
+            <h1>{pageMeta.title}</h1>
+            <p>{pageMeta.subtitle}</p>
           </div>
 
           <div className="admin-userbox">
@@ -97,7 +108,9 @@ function AdminLayout() {
           </div>
         </header>
 
-        <main className="admin-content">{renderContent()}</main>
+        <main className="admin-content">
+          <Outlet />
+        </main>
       </div>
     </div>
   );

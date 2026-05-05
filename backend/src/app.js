@@ -7,6 +7,7 @@ const serviceRoutes = require("./routes/serviceRoutes");
 const barberRoutes = require("./routes/barberRoutes");
 const bookingRoutes = require("./routes/bookingRoutes");
 const adminRoutes = require("./routes/adminRoutes");
+const adminUserRoutes = require("./routes/adminUserRoutes");
 const errorHandler = require("./middlewares/errorHandler");
 
 const app = express();
@@ -24,6 +25,7 @@ app.use("/api/services", serviceRoutes);
 app.use("/api/barbers", barberRoutes);
 app.use("/api/bookings", bookingRoutes);
 app.use("/api/admin", adminRoutes);
+app.use("/api/admin/users", adminUserRoutes);
 
 app.use((req, res) => {
   res.status(404).json({
