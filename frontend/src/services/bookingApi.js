@@ -73,4 +73,126 @@ export const getAvailableSlots = async (date) => {
   }
 };
 
+/**
+ * Get current user's bookings
+ * @returns {Promise<{success: boolean, message: string, data: Array}>}
+ */
+export const getMyBookings = async () => {
+  try {
+    const response = await bookingApiClient.get("/bookings/my-bookings");
+    const payload = response.data;
+
+    const normalizeWorkerName = (item) => {
+      if (item?.worker?.name) {
+        return item.worker.name;
+      }
+
+      if (item?.barber?.user) {
+        const firstName = item.barber.user.firstName || "";
+        const lastName = item.barber.user.lastName || "";
+        const fullName = `${firstName} ${lastName}`.trim();
+        if (fullName) {
+          return fullName;
+        }
+      }
+
+      return "Chưa cập nhật";
+    };
+
+    const normalizeServiceName = (item) => {
+      if (item?.service?.name) {
+        return item.service.name;
+      }
+
+      if (Array.isArray(item?.bookingServices) && item.bookingServices.length > 0) {
+        const serviceNames = item.bookingServices
+          .map((bookingService) => bookingService?.service?.name)
+          .filter(Boolean);
+
+        if (serviceNames.length > 0) {
+          return serviceNames.join(", ");
+        }
+      }
+
+      return "Chưa cập nhật";
+    };
+
+    const normalizeBookings = (rawBookings) =>
+      rawBookings.map((item) => ({
+        id: item?.id,
+        date: item?.date || item?.bookingDate || "",
+        startTime: item?.startTime || "",
+        endTime: item?.endTime || "",
+        status: item?.status || "pending",
+        worker: {
+          name: normalizeWorkerName(item),
+        },
+        service: {
+          name: normalizeServiceName(item),
+        },
+      }));
+
+    if (Array.isArray(payload)) {
+      return {
+        success: true,
+        message: "Success",
+        data: normalizeBookings(payload),
+      };
+    }
+
+    const bookings = Array.isArray(payload?.data) ? payload.data : [];
+
+    return {
+      success: Boolean(payload?.success ?? true),
+      message: payload?.message || "Success",
+      data: normalizeBookings(bookings),
+    };
+  } catch (error) {
+    const message =
+      error?.response?.data?.message || error?.message || "Unknown error";
+    return { success: false, message, data: [] };
+  }
+};
+
+/**
+ * Cancel booking by id
+ * @param {string} bookingId
+ * @returns {Promise<{success: boolean, message: string}>}
+ */
+export const cancelBooking = async (bookingId) => {
+  try {
+    const response = await bookingApiClient.delete(`/bookings/${bookingId}`);
+    const payload = response.data;
+
+    return {
+      success: Boolean(payload?.success ?? true),
+      message: payload?.message || "Cancelled successfully",
+    };
+  } catch (error) {
+    // Keep backward compatibility if backend also supports patch cancel route.
+    if (error?.response?.status === 404) {
+      try {
+        const patchResponse = await bookingApiClient.patch(
+          `/bookings/${bookingId}/cancel`,
+        );
+        const patchPayload = patchResponse.data;
+        return {
+          success: Boolean(patchPayload?.success ?? true),
+          message: patchPayload?.message || "Cancelled successfully",
+        };
+      } catch (patchError) {
+        const patchMessage =
+          patchError?.response?.data?.message ||
+          patchError?.message ||
+          "Unknown error";
+        return { success: false, message: patchMessage };
+      }
+    }
+
+    const message =
+      error?.response?.data?.message || error?.message || "Unknown error";
+    return { success: false, message };
+  }
+};
+
 export default bookingApiClient;

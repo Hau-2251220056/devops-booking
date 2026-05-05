@@ -23,7 +23,7 @@ function Header() {
     { label: "Trang chủ", href: "/" },
     { label: "Dịch vụ", href: "/booking" },
     { label: "Thợ cắt tóc", href: "/barbers" },
-    { label: "Lịch hẹn", href: "/#booking" },
+    { label: "Lịch hẹn", href: "/booking-history" },
   ];
 
   return (
