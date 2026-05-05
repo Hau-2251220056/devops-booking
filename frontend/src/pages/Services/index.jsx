@@ -253,7 +253,7 @@ function BookingPage() {
       };
 
       // Log booking data to console
-      console.log("Booking data submitted:", bookingData);
+      // console.log("Booking data submitted:", bookingData);
 
       // Call API
       const response = await createBooking(bookingData);

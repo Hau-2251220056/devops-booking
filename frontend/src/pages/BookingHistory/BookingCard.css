@@ -60,6 +60,11 @@
   color: #166534;
 }
 
+.status-cancellation-pending {
+  background: #fef3c7;
+  color: #92400e;
+}
+
 .status-completed {
   background: #e2e8f0;
   color: #334155;

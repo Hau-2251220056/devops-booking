@@ -1,4 +1,3 @@
-import { Star } from "lucide-react";
 import "./ServiceSelector.css";
 
 function ServiceSelector({ services, selectedService, onSelectService }) {
@@ -13,8 +12,9 @@ function ServiceSelector({ services, selectedService, onSelectService }) {
         {services.map((service) => (
           <div
             key={service.id}
-            className={`service-card ${selectedService?.id === service.id ? "selected" : ""
-              }`}
+            className={`service-card ${
+              selectedService?.id === service.id ? "selected" : ""
+            }`}
             onClick={() => onSelectService(service)}
             role="button"
             tabIndex={0}
@@ -45,18 +45,16 @@ function ServiceSelector({ services, selectedService, onSelectService }) {
             )}
 
             <div className="service-image">
-              <div className="image-placeholder">
-                <Star size={32} />
-              </div>
+              <div className="image-placeholder">{services.imageUrl}</div>
             </div>
 
             <div className="service-info">
               <h3 className="service-name">{service.name}</h3>
               <p className="service-description">{service.description}</p>
               <div className="service-meta">
-                <span className="service-duration">
+                {/* <span className="service-duration">
                   {service.duration} phút
-                </span>
+                </span> */}
                 <span className="service-price">
                   {service.price?.toLocaleString("vi-VN")}đ
                 </span>

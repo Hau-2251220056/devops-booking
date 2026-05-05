@@ -18,12 +18,7 @@
     margin: 0 auto;
 }
 
-.barbers-hero-grid {
-    display: grid;
-    grid-template-columns: 1.4fr 0.9fr;
-    gap: 1.5rem;
-    align-items: stretch;
-}
+
 
 .barbers-hero-copy,
 .barbers-hero-panel,

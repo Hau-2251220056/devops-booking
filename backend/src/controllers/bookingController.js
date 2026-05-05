@@ -40,6 +40,31 @@ const remove = asyncHandler(async (req, res) => {
   return sendSuccess(res, "Booking cancelled successfully", result);
 });
 
+const requestCancellation = asyncHandler(async (req, res) => {
+  const result = await bookingService.requestCancellation(
+    req.params.id,
+    req.user,
+    req.body?.reason,
+  );
+  return sendSuccess(res, "Cancellation request sent successfully", result);
+});
+
+const approveCancellation = asyncHandler(async (req, res) => {
+  const result = await bookingService.approveCancellation(
+    req.params.id,
+    req.user,
+  );
+  return sendSuccess(res, "Cancellation approved successfully", result);
+});
+
+const rejectCancellation = asyncHandler(async (req, res) => {
+  const result = await bookingService.rejectCancellation(
+    req.params.id,
+    req.user,
+  );
+  return sendSuccess(res, "Cancellation rejected successfully", result);
+});
+
 module.exports = {
   getAvailableSlots,
   create,
@@ -47,4 +72,7 @@ module.exports = {
   getAll,
   updateStatus,
   remove,
+  requestCancellation,
+  approveCancellation,
+  rejectCancellation,
 };

@@ -12,8 +12,13 @@ import "../../pages/Admin/Dashboard/Dashboard.css";
 
 const MENU_ITEMS = [
   { key: "dashboard", label: "Dashboard", icon: FaTachometerAlt, to: "/admin" },
-  { key: "bookings", label: "Bookings", icon: FaClipboardList, to: "/admin/bookings" },
   { key: "users", label: "Users", icon: FaUsers, to: "/admin/users" },
+  {
+    key: "bookings",
+    label: "Bookings",
+    icon: FaClipboardList,
+    to: "/admin/bookings",
+  },
 ];
 
 function AdminLayout() {
@@ -101,7 +106,11 @@ function AdminLayout() {
               <span>{user?.role || "admin"}</span>
             </div>
 
-            <button type="button" className="admin-logout-btn" onClick={handleLogout}>
+            <button
+              type="button"
+              className="admin-logout-btn"
+              onClick={handleLogout}
+            >
               <FaSignOutAlt />
               <span>Logout</span>
             </button>
