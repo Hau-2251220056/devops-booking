@@ -8,13 +8,31 @@ import Service from "./pages/Services";
 import Barbers from "./pages/Barbers";
 import BookingHistory from "./pages/BookingHistory/BookingHistory";
 import ProtectedRoute from "./components/ProtectedRoute";
+import RoleRoute from "./components/RoleRoute";
+import AdminLayout from "./components/AdminLayout";
+import { useAuth } from "./contexts/useAuth";
+
+function HomeRoute() {
+  const { user, loading, isAuthenticated } = useAuth();
+
+  if (loading) {
+    return <div style={{ minHeight: "100vh", display: "grid", placeItems: "center" }}>Loading...</div>;
+  }
+
+  if (isAuthenticated && user?.role === "admin") {
+    return <Navigate to="/admin" replace />;
+  }
+
+  return <Home />;
+}
+
 function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
         <ToastProvider>
           <Routes>
-            <Route path="/" element={<Home />} />
+            <Route path="/" element={<HomeRoute />} />
             <Route path="/barbers" element={<Barbers />} />
             <Route path="/booking" element={<Service />} />
             <Route
@@ -23,6 +41,14 @@ function App() {
                 <ProtectedRoute>
                   <BookingHistory />
                 </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin"
+              element={
+                <RoleRoute allowedRoles={["admin"]}>
+                  <AdminLayout />
+                </RoleRoute>
               }
             />
             <Route path="/login" element={<Login />} />

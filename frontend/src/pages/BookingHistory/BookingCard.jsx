@@ -51,12 +51,16 @@ function BookingCard({ booking, canCancel, isCancelling, onCancel }) {
 
         <div className="booking-row">
           <span className="booking-label">Thợ</span>
-          <span className="booking-value">{booking?.worker?.name || "Chưa cập nhật"}</span>
+          <span className="booking-value">
+            {booking?.worker?.name || "Chưa cập nhật"}
+          </span>
         </div>
 
         <div className="booking-row">
           <span className="booking-label">Dịch vụ</span>
-          <span className="booking-value">{booking?.service?.name || "Chưa cập nhật"}</span>
+          <span className="booking-value">
+            {booking?.service?.name || "Chưa cập nhật"}
+          </span>
         </div>
       </div>
 

@@ -36,7 +36,8 @@ export default function Login() {
             const response = await apiLogin(formData);
             if (response.success && response.data) {
                 login(response.data.user, response.data.token);
-                navigate('/');
+                const nextPath = response.data.user.role === 'admin' ? '/admin' : '/';
+                navigate(nextPath, { replace: true });
             } else {
                 setError(response.message || 'Đăng nhập thất bại');
             }
