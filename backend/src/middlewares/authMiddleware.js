@@ -1,35 +1,35 @@
 // @ts-nocheck
-const jwt = require("jsonwebtoken");
-const ApiError = require("../utils/ApiError");
+const jwt = require('jsonwebtoken');
+const ApiError = require('../utils/ApiError');
 
 const getJwtSecret = () => {
-  const secret = process.env.JWT_SECRET;
-  if (secret) {
-    return secret;
-  }
+    const secret = process.env.JWT_SECRET;
+    if (secret) {
+        return secret;
+    }
 
-  if (process.env.NODE_ENV === "production") {
-    throw new ApiError(500, "JWT_SECRET is required in production");
-  }
+    if (process.env.NODE_ENV === 'production') {
+        throw new ApiError(500, 'JWT_SECRET is required in production');
+    }
 
-  return "booking-system-dev-secret";
+    return 'booking-system-dev-secret';
 };
 
 const authMiddleware = (req, res, next) => {
-  const header = req.headers.authorization;
-  if (!header || !header.startsWith("Bearer ")) {
-    return next(new ApiError(401, "Unauthorized"));
-  }
+    const header = req.headers.authorization;
+    if (!header || !header.startsWith('Bearer ')) {
+        return next(new ApiError(401, 'Unauthorized'));
+    }
 
-  const token = header.split(" ")[1];
+    const token = header.split(' ')[1];
 
-  try {
-    const decoded = jwt.verify(token, getJwtSecret());
-    req.user = decoded;
-    return next();
-  } catch (_) {
-    return next(new ApiError(401, "Invalid or expired token"));
-  }
+    try {
+        const decoded = jwt.verify(token, getJwtSecret());
+        req.user = decoded;
+        return next();
+    } catch (_) {
+        return next(new ApiError(401, 'Invalid or expired token'));
+    }
 };
 
 module.exports = authMiddleware;
