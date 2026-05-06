@@ -1,19 +1,19 @@
-const express = require("express");
-const authMiddleware = require("../middlewares/authMiddleware");
-const adminMiddleware = require("../middlewares/adminMiddleware");
-const validateRequest = require("../middlewares/validateRequest");
-const adminUserController = require("../controllers/adminUserController");
+const express = require('express');
+const authMiddleware = require('../middlewares/authMiddleware');
+const adminMiddleware = require('../middlewares/adminMiddleware');
+const validateRequest = require('../middlewares/validateRequest');
+const adminUserController = require('../controllers/adminUserController');
 const {
     listUsersValidation,
     updateUserValidation,
     userIdValidation,
     createUserValidation,
-} = require("../validations/adminUserValidation");
+} = require('../validations/adminUserValidation');
 
 const router = express.Router();
 
 router.get(
-    "/",
+    '/',
     authMiddleware,
     adminMiddleware,
     listUsersValidation,
@@ -22,7 +22,7 @@ router.get(
 );
 
 router.post(
-    "/",
+    '/',
     authMiddleware,
     adminMiddleware,
     createUserValidation,
@@ -31,7 +31,7 @@ router.post(
 );
 
 router.patch(
-    "/:id",
+    '/:id',
     authMiddleware,
     adminMiddleware,
     updateUserValidation,
@@ -40,7 +40,7 @@ router.patch(
 );
 
 router.delete(
-    "/:id",
+    '/:id',
     authMiddleware,
     adminMiddleware,
     userIdValidation,

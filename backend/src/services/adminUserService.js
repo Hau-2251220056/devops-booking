@@ -1,6 +1,6 @@
-const prisma = require("../configs/prisma");
-const ApiError = require("../utils/ApiError");
-const bcrypt = require("bcryptjs");
+const prisma = require('../configs/prisma');
+const ApiError = require('../utils/ApiError');
+const bcrypt = require('bcryptjs');
 
 const serializeUser = (user) => ({
     id: user.id,
@@ -16,7 +16,7 @@ const serializeUser = (user) => ({
 });
 
 const buildSearchWhere = (q) => {
-    const term = (q || "").trim();
+    const term = (q || '').trim();
 
     if (!term) {
         return { deletedAt: null };
@@ -25,16 +25,16 @@ const buildSearchWhere = (q) => {
     return {
         deletedAt: null,
         OR: [
-            { username: { contains: term, mode: "insensitive" } },
-            { email: { contains: term, mode: "insensitive" } },
-            { firstName: { contains: term, mode: "insensitive" } },
-            { lastName: { contains: term, mode: "insensitive" } },
-            { phone: { contains: term, mode: "insensitive" } },
+            { username: { contains: term, mode: 'insensitive' } },
+            { email: { contains: term, mode: 'insensitive' } },
+            { firstName: { contains: term, mode: 'insensitive' } },
+            { lastName: { contains: term, mode: 'insensitive' } },
+            { phone: { contains: term, mode: 'insensitive' } },
         ],
     };
 };
 
-const listUsers = async ({ q = "", page = 1, limit = 10 } = {}) => {
+const listUsers = async ({ q = '', page = 1, limit = 10 } = {}) => {
     const currentPage = Math.max(Number(page) || 1, 1);
     const currentLimit = Math.min(Math.max(Number(limit) || 10, 1), 100);
     const where = buildSearchWhere(q);
@@ -44,7 +44,7 @@ const listUsers = async ({ q = "", page = 1, limit = 10 } = {}) => {
         prisma.user.count({ where }),
         prisma.user.findMany({
             where,
-            orderBy: { createdAt: "desc" },
+            orderBy: { createdAt: 'desc' },
             skip,
             take: currentLimit,
             select: {
@@ -77,7 +77,7 @@ const updateUser = async (id, payload = {}) => {
     });
 
     if (!existingUser) {
-        throw new ApiError(404, "User not found");
+        throw new ApiError(404, 'User not found');
     }
 
     const data = {};
@@ -98,7 +98,7 @@ const updateUser = async (id, payload = {}) => {
     }
 
     if (Object.keys(data).length === 0) {
-        throw new ApiError(400, "At least one field is required");
+        throw new ApiError(400, 'At least one field is required');
     }
 
     const updatedUser = await prisma.user.update({
@@ -123,7 +123,7 @@ const updateUser = async (id, payload = {}) => {
 
 const deleteUser = async (id, currentUserId) => {
     if (id === currentUserId) {
-        throw new ApiError(400, "You cannot delete your own account");
+        throw new ApiError(400, 'You cannot delete your own account');
     }
 
     const existingUser = await prisma.user.findFirst({
@@ -131,7 +131,7 @@ const deleteUser = async (id, currentUserId) => {
     });
 
     if (!existingUser) {
-        throw new ApiError(404, "User not found");
+        throw new ApiError(404, 'User not found');
     }
 
     const deletedUser = await prisma.user.update({
@@ -158,11 +158,11 @@ const deleteUser = async (id, currentUserId) => {
 };
 
 const createUser = async (payload = {}) => {
-    const username = (payload.username || "").trim();
-    const email = (payload.email || "").trim().toLowerCase();
+    const username = (payload.username || '').trim();
+    const email = (payload.email || '').trim().toLowerCase();
 
     if (!username || !email) {
-        throw new ApiError(400, "Username and email are required");
+        throw new ApiError(400, 'Username and email are required');
     }
 
     const existing = await prisma.user.findFirst({
@@ -172,10 +172,10 @@ const createUser = async (payload = {}) => {
     });
 
     if (existing) {
-        throw new ApiError(400, "Username or email already exists");
+        throw new ApiError(400, 'Username or email already exists');
     }
 
-    const rawPassword = payload.password || "password123";
+    const rawPassword = payload.password || 'password123';
     const passwordHash = await bcrypt.hash(rawPassword, 10);
 
     const created = await prisma.user.create({
@@ -186,7 +186,7 @@ const createUser = async (payload = {}) => {
             firstName: payload.firstName || null,
             lastName: payload.lastName || null,
             phone: payload.phone || null,
-            role: payload.role || "customer",
+            role: payload.role || 'customer',
             isActive: payload.isActive === undefined ? true : Boolean(payload.isActive),
             isVerified: false,
         },
