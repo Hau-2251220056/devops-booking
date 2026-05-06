@@ -4,7 +4,7 @@ const app = require("./app");
 
 console.log(" [BOOT] server.js starting...");
 
-const PORT = process.env.PORT;
+const PORT = process.env.PORT || 5000;
 
 console.log(" [ENV] PORT =", PORT);
 
