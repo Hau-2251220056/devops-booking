@@ -28,7 +28,7 @@ const authMiddleware = (req, res, next) => {
         req.user = decoded;
         return next();
     } catch (_) {
-        return next(new ApiError(401, "Invalid or expired token"));
+        return next(new ApiError(401, 'Invalid or expired token'));
     }
 };
 
