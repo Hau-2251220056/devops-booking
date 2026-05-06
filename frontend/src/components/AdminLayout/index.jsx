@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 import {
   FaClipboardList,
+  FaCut,
   FaSignOutAlt,
   FaTachometerAlt,
   FaUsers,
@@ -18,6 +19,12 @@ const MENU_ITEMS = [
     label: "Bookings",
     icon: FaClipboardList,
     to: "/admin/bookings",
+  },
+  {
+    key: "services",
+    label: "Services",
+    icon: FaCut,
+    to: "/admin/services",
   },
 ];
 
@@ -46,6 +53,13 @@ function AdminLayout() {
       return {
         title: "Booking Management",
         subtitle: "Quản lý lịch hẹn và trạng thái booking",
+      };
+    }
+
+    if (pathname.startsWith("/admin/services")) {
+      return {
+        title: "Service Management",
+        subtitle: "Quản lý danh sách dịch vụ và thông tin hiển thị",
       };
     }
 

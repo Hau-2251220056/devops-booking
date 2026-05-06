@@ -15,6 +15,15 @@
   gap: 24px;
 }
 
+/* Make sidebar stay visible when scrolling main content on wide screens */
+.admin-sidebar {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow: auto;
+  z-index: 10;
+}
+
 .admin-brand {
   display: flex;
   align-items: center;
@@ -342,6 +351,12 @@
 @media (max-width: 1024px) {
   .admin-shell {
     grid-template-columns: 1fr;
+  }
+
+  /* On smaller screens sidebar should be in normal flow */
+  .admin-sidebar {
+    position: static;
+    height: auto;
   }
 
   .dashboard-grid {
