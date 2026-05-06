@@ -1,8 +1,8 @@
-const test = require("node:test");
-const assert = require("node:assert/strict");
+const test = require('node:test');
+const assert = require('node:assert/strict');
 
-const prisma = require("../src/configs/prisma");
-const adminUserService = require("../src/services/adminUserService");
+const prisma = require('../src/configs/prisma');
+const adminUserService = require('../src/services/adminUserService');
 
 const originalUserMethods = {
     count: prisma.user.count,
@@ -22,7 +22,7 @@ test.afterEach(() => {
     restorePrisma();
 });
 
-test("listUsers applies search and pagination", async () => {
+test('listUsers applies search and pagination', async () => {
     let countWhere = null;
     let findManyArgs = null;
 
@@ -35,21 +35,21 @@ test("listUsers applies search and pagination", async () => {
         findManyArgs = args;
         return [
             {
-                id: "1",
-                username: "alice",
-                email: "alice@example.com",
-                firstName: "Alice",
-                lastName: "Nguyen",
-                phone: "0901",
+                id: '1',
+                username: 'alice',
+                email: 'alice@example.com',
+                firstName: 'Alice',
+                lastName: 'Nguyen',
+                phone: '0901',
                 avatarUrl: null,
-                role: "customer",
+                role: 'customer',
                 isActive: true,
-                createdAt: new Date("2026-01-01T00:00:00.000Z"),
+                createdAt: new Date('2026-01-01T00:00:00.000Z'),
             },
         ];
     };
 
-    const result = await adminUserService.listUsers({ q: "alice", page: 2, limit: 5 });
+    const result = await adminUserService.listUsers({ q: 'alice', page: 2, limit: 5 });
 
     assert.equal(countWhere.deletedAt, null);
     assert.equal(countWhere.OR.length, 5);
@@ -59,33 +59,33 @@ test("listUsers applies search and pagination", async () => {
     assert.equal(result.limit, 5);
     assert.equal(result.total, 12);
     assert.equal(result.totalPages, 3);
-    assert.equal(result.users[0].username, "alice");
+    assert.equal(result.users[0].username, 'alice');
 });
 
-test("updateUser updates role and active state", async () => {
-    prisma.user.findFirst = async () => ({ id: "1" });
+test('updateUser updates role and active state', async () => {
+    prisma.user.findFirst = async () => ({ id: '1' });
     prisma.user.update = async ({ data }) => ({
-        id: "1",
-        username: "john",
-        email: "john@example.com",
-        firstName: "John",
-        lastName: "Doe",
-        phone: "0902",
+        id: '1',
+        username: 'john',
+        email: 'john@example.com',
+        firstName: 'John',
+        lastName: 'Doe',
+        phone: '0902',
         avatarUrl: null,
         role: data.role,
         isActive: data.isActive,
-        createdAt: new Date("2026-01-01T00:00:00.000Z"),
+        createdAt: new Date('2026-01-01T00:00:00.000Z'),
     });
 
-    const result = await adminUserService.updateUser("1", { role: "staff", isActive: false });
+    const result = await adminUserService.updateUser('1', { role: 'staff', isActive: false });
 
-    assert.equal(result.role, "staff");
+    assert.equal(result.role, 'staff');
     assert.equal(result.isActive, false);
 });
 
-test("deleteUser prevents deleting own account", async () => {
+test('deleteUser prevents deleting own account', async () => {
     await assert.rejects(
-        () => adminUserService.deleteUser("1", "1"),
-        (error) => error.statusCode === 400 && error.message === "You cannot delete your own account",
+        () => adminUserService.deleteUser('1', '1'),
+        (error) => error.statusCode === 400 && error.message === 'You cannot delete your own account',
     );
 });
