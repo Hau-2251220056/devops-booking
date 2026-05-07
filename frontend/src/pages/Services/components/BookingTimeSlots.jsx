@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { formatDateForApi } from "../../../utils/dateHelper";
 import "./BookingTimeSlots.css";
 
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+const API_URL = import.meta.env.VITE_API_URL;
 
 const normalizeSlots = (payload) => {
   if (Array.isArray(payload)) {
