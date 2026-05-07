@@ -12,7 +12,28 @@ const errorHandler = require('./middlewares/errorHandler');
 
 const app = express();
 
-app.use(cors());
+// Configure CORS for both deployed frontend and local Docker/SPA development.
+const allowedOrigins = ['http://localhost:5173', 'http://127.0.0.1:5173'];
+
+if (process.env.FRONTEND_URL) {
+    allowedOrigins.push(process.env.FRONTEND_URL);
+}
+
+console.log(' [CORS] Allowed origins:', allowedOrigins);
+
+app.use(
+    cors({
+        origin: (origin, callback) => {
+            // allow non-browser requests like curl/postman with no origin
+            if (!origin) return callback(null, true);
+            if (allowedOrigins.includes(origin)) {
+                return callback(null, true);
+            }
+            return callback(new Error('CORS policy: Origin not allowed'));
+        },
+        credentials: true,
+    }),
+);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
