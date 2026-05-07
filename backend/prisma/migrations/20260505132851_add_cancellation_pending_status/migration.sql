@@ -84,10 +84,10 @@ CREATE INDEX "services_is_active_idx" ON "services"("is_active");
 CREATE INDEX "services_category_idx" ON "services"("category");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "users_username_key" ON "users"("username");
+-- CREATE UNIQUE INDEX "users_username_key" ON "users"("username");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "users_email_key" ON "users"("email");
+-- CREATE UNIQUE INDEX "users_email_key" ON "users"("email");
 
 -- CreateIndex
 CREATE INDEX "users_role_idx" ON "users"("role");

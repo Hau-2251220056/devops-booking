@@ -1,21 +1,14 @@
-# backend/Dockerfile
-FROM node:22-alpine
+FROM node:22-slim
 
 WORKDIR /app
 
-# Cài dependencies trước để tận dụng cache layer
+RUN apt-get update -y && apt-get install -y openssl
+
 COPY package*.json ./
 RUN npm install
 
-# Copy source
 COPY . .
-
-# Generate Prisma client
-RUN npm run prisma:generate
-
-ENV NODE_ENV=production
-ENV PORT=5000
 
 EXPOSE 5000
 
-CMD ["npm", "run", "dev"]
+CMD ["sh", "-c", "npx prisma generate && npm run dev"]
