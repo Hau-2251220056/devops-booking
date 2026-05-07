@@ -4,21 +4,53 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "nodemon src/index.js",
-    "start": "node src/index.js"
+    "dev": "nodemon src/server.js",
+    "start": "node src/server.js",
+
+    "prisma:generate": "prisma generate",
+
+    "build": "npm run prisma:generate",
+
+    "migrate:deploy": "prisma migrate deploy",
+    "migrate:dev": "prisma migrate dev",
+    "migrate:reset": "prisma migrate reset",
+
+    "db:push": "prisma db push",
+    "db:studio": "prisma studio",
+
+    "seed": "node prisma/seed.js",
+
+    "lint": "eslint src tests",
+    "lint:fix": "eslint src tests --fix",
+    "test": "node --test"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@prisma/client": "^7.8.0",
+    "@prisma/client": "^5.22.0",
+    "bcryptjs": "^2.4.3",
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",
-    "express": "^5.2.1"
+    "express": "^5.2.1",
+    "express-validator": "^7.3.2",
+    "jsonwebtoken": "^9.0.3",
+    "prisma": "^5.22.0"
   },
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@types/bcrypt": "^6.0.0",
+    "@types/bcryptjs": "^2.4.6",
+    "@types/node": "^25.6.0",
+    "eslint": "^10.2.1",
     "nodemon": "^3.1.14",
-    "prisma": "^7.8.0"
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.3"
+  },
+  "engines": {
+    "node": "20.x"
+  },
+  "prisma": {
+    "seed": "ts-node prisma/seed.ts"
   }
 }

@@ -1,0 +1,75 @@
+.booking-barbers-grid {
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+}
+
+.barber-option {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: 0.9rem;
+    width: 100%;
+    padding: 1rem;
+    border: 2px solid #e5e7eb;
+    border-radius: 0.9rem;
+    background: #fff;
+    color: #111827;
+    cursor: pointer;
+    transition: all 200ms ease;
+    text-align: left;
+}
+
+.barber-option:hover {
+    border-color: #3b82f6;
+    box-shadow: 0 4px 14px rgba(59, 130, 246, 0.12);
+    transform: translateY(-1px);
+}
+
+.barber-option.selected {
+    border-color: #3b82f6;
+    background: #eff6ff;
+    box-shadow: 0 4px 14px rgba(59, 130, 246, 0.16);
+}
+
+.barber-option-icon {
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #dbeafe;
+    color: #2563eb;
+    flex-shrink: 0;
+}
+
+.barber-option-content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+}
+
+.barber-option-content strong {
+    font-size: 0.95rem;
+}
+
+.barber-option-content span {
+    color: #6b7280;
+    font-size: 0.8rem;
+}
+
+.barber-option-meta {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #2563eb;
+}
+
+@media (max-width: 640px) {
+    .barber-option {
+        grid-template-columns: auto 1fr;
+    }
+
+    .barber-option-meta {
+        grid-column: 1 / -1;
+        justify-self: end;
+    }
+}

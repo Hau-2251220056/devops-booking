@@ -1,0 +1,86 @@
+name: CI Pipeline
+
+on:
+  push:
+    branches:
+      - dev
+      - main
+  pull_request:
+    branches:
+      - dev
+      - main
+
+jobs:
+  backend:
+    name: Backend CI
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: backend
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: backend/package-lock.json
+
+      # 1. INSTALL
+      - name: Install dependencies
+        run: npm ci
+
+      # Prisma nên chạy trước test để đảm bảo môi trường DB client
+      - name: Prisma generate
+        run: npx prisma generate
+
+      # 2. LINT
+      - name: Lint
+        run: npm run lint
+
+      # 3. TEST
+      - name: Test
+        run: npm run test
+
+      # 4. BUILD
+      - name: Build
+        run: npm run build
+
+  frontend:
+    name: Frontend CI
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: frontend
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      # 1. INSTALL
+      - name: Install dependencies
+        run: npm ci
+
+      # 2. LINT (strict mode)
+      - name: Lint
+        run: npm run lint -- --max-warnings=0
+
+      # 3. TEST
+      - name: Test
+        run: npm run test
+
+      # 4. BUILD
+      - name: Build application
+        run: npm run build
