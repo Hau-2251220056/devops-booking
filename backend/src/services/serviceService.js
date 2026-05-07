@@ -43,17 +43,34 @@ const getById = async (id) => {
 };
 
 const create = async (payload) => {
-    const branch = await prisma.branch.findFirst({
-        where: { id: payload.branchId, deletedAt: null },
-    });
+    let branchId = payload.branchId;
 
-    if (!branch) {
-        throw new ApiError(404, 'Branch not found');
+    // If branchId not provided, use first active branch
+    if (!branchId) {
+        const firstBranch = await prisma.branch.findFirst({
+            where: { isActive: true, deletedAt: null },
+            orderBy: { name: 'asc' },
+        });
+
+        if (!firstBranch) {
+            throw new ApiError(400, 'No active branches available');
+        }
+
+        branchId = firstBranch.id;
+    } else {
+        // Verify branch exists if branchId provided
+        const branch = await prisma.branch.findFirst({
+            where: { id: branchId, deletedAt: null },
+        });
+
+        if (!branch) {
+            throw new ApiError(404, 'Branch not found');
+        }
     }
 
     const service = await prisma.service.create({
         data: {
-            branchId: payload.branchId,
+            branchId,
             name: payload.name,
             description: payload.description,
             price: payload.price,

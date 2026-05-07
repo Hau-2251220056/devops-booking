@@ -27,7 +27,7 @@ const authMiddleware = (req, res, next) => {
         const decoded = jwt.verify(token, getJwtSecret());
         req.user = decoded;
         return next();
-    } catch (_) {
+    } catch {
         return next(new ApiError(401, 'Invalid or expired token'));
     }
 };

@@ -10,7 +10,6 @@ import {
 import "./Services.css";
 
 const EMPTY_FORM = {
-  branchId: "",
   name: "",
   description: "",
   price: "",
@@ -77,7 +76,6 @@ function AdminServices() {
   const openEdit = (service) => {
     setSelectedService(service);
     setForm({
-      branchId: service.branchId || "",
       name: service.name || "",
       description: service.description || "",
       price: service.price || "",
@@ -103,6 +101,11 @@ function AdminServices() {
       durationMinutes: Number.parseInt(form.durationMinutes, 10),
       orderIndex: Number.parseInt(form.orderIndex, 10) || 0,
     };
+
+    // Preserve branchId when editing an existing service
+    if (isEditing && selectedService?.branchId) {
+      payload.branchId = selectedService.branchId;
+    }
 
     try {
       if (isEditing) {
@@ -289,18 +292,6 @@ function AdminServices() {
             </div>
 
             <form className="modal-form services-form" onSubmit={handleSubmit}>
-              <div className="field-group field-span-2">
-                <span>Branch ID (UUID)</span>
-                <input
-                  className="input-field"
-                  value={form.branchId}
-                  onChange={(event) =>
-                    setForm({ ...form, branchId: event.target.value })
-                  }
-                  required
-                />
-              </div>
-
               <div className="field-group">
                 <span>Tên</span>
                 <input

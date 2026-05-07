@@ -5,7 +5,10 @@ const idParamValidation = [
 ];
 
 const createServiceValidation = [
-    body('branchId').isUUID().withMessage('branchId is required'),
+    body('branchId')
+        .optional()
+        .isUUID()
+        .withMessage('branchId must be valid UUID'),
     body('name')
         .trim()
         .notEmpty()
