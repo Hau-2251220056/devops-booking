@@ -1,5 +1,6 @@
 // @ts-nocheck
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { FaArrowRight, FaStar, FaTag } from "react-icons/fa";
 import Header from "../../components/Header";
 import Footer from "../../components/Footer";
@@ -122,9 +123,9 @@ export default function Home() {
               </p>
 
               <div className="cta-row">
-                <button className="btn btn-primary">
-                  Khám phá dịch vụ <FaArrowRight />
-                </button>
+                <Link className="btn-link" to="/booking">
+                  Khám phá dịch vụ <FaArrowRight className="link-icon" />
+                </Link>
                 <button className="btn btn-ghost">Xem bảng giá</button>
                 <div className="stats">
                   <div className="stat">
@@ -142,18 +143,13 @@ export default function Home() {
             <div className="hero-right">
               <div className="hero-image">
                 <img
-                  src="https://images.unsplash.com/photo-1543168256-4188115769f7?q=80&w=1400&auto=format&fit=crop&ixlib=rb-4.0.3&s=0e3c82a4b2e4a7c6f3d2bf3a7f2a6b8f"
-                  alt="hero"
+                  src="https://dkdecor.vn/wp-content/uploads/2023/12/thi-cong-salon-toc-da-nang-tron-goi-min-1024x731.jpeg"
+                  alt="salon"
                 />
               </div>
 
               <div className="overlay-card">
-                <div className="overlay-thumb">
-                  <img
-                    src="https://images.unsplash.com/photo-1605902711622-cfb43c44367e?q=80&w=800&auto=format&fit=crop&ixlib=rb-4.0.3&s=2c5a5c7e3a"
-                    alt="salon"
-                  />
-                </div>
+                <div className="overlay-thumb"></div>
                 <div className="overlay-content">
                   <h3>Khám phá dịch vụ cao cấp</h3>
                   <p>
@@ -185,9 +181,9 @@ export default function Home() {
                 Chọn salon đỉnh với những chi tiết nhỏ nhất
               </p>
             </div>
-            <a href="#" className="section-link">
+            <Link to="/booking" className="section-link">
               Xem tất cả dịch vụ
-            </a>
+            </Link>
           </div>
 
           {errorServices ? (
@@ -226,7 +222,7 @@ export default function Home() {
                 <img
                   src={
                     services[1]?.imageUrl ||
-                    "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?q=80&w=1000&auto=format&fit=crop"
+                    "https://tse4.mm.bing.net/th/id/OIP.3dR_B3rgofer8RTExXsJvwHaHa?pid=Api&P=0&h=180"
                   }
                   alt={services[1]?.name || "Dịch vụ nổi bật"}
                 />
@@ -246,7 +242,9 @@ export default function Home() {
                 </div>
               </div>
               <div className="featured-actions">
-                <button className="btn btn-primary">Đặt lịch ngay</button>
+                <button className="btn btn-primary">
+                  <Link to="/booking">Đặt lịch ngay</Link>
+                </button>
               </div>
             </div>
           )}
