@@ -259,7 +259,7 @@ function BookingPage() {
       const response = await createBooking(bookingData);
       if (response.success) {
         setSubmitStatus("success");
-        toast.success("Đặt lịch thành công! Chúng tôi đã gửi xác nhận.");
+        toast.success("Đặt lịch thành công!");
         // Reset form after success
         setTimeout(() => {
           setSelectedService(null);
@@ -353,8 +353,7 @@ function BookingPage() {
               <div className="alert-content">
                 <p className="alert-title">Đặt lịch thành công!</p>
                 <p className="alert-message">
-                  Chúng tôi đã nhận được yêu cầu của bạn. Vui lòng kiểm tra
-                  email hoặc tin nhắn để xác nhận.
+                  Chúng tôi đã nhận được yêu cầu của bạn
                 </p>
               </div>
             </div>
