@@ -47,13 +47,21 @@ function BookingPage() {
   const [slotReloadKey, setSlotReloadKey] = useState(0);
 
   const filteredServices = useMemo(() => {
-    if (!selectedBarber?.branchId) {
-      return services;
-    }
+    if (!selectedBarber) return services;
 
-    return services.filter(
-      (service) => service.branchId === selectedBarber.branchId,
-    );
+    const barberBranchId =
+      selectedBarber.branchId ??
+      selectedBarber.branch?.id ??
+      selectedBarber.branch?._id ??
+      null;
+
+    if (!barberBranchId) return services;
+
+    return services.filter((service) => {
+      const serviceBranchId =
+        service.branchId ?? service.branch?.id ?? service.branch?._id ?? null;
+      return serviceBranchId === barberBranchId;
+    });
   }, [services, selectedBarber]);
 
   const suggestedCustomerInfo = useMemo(() => {
@@ -152,11 +160,21 @@ function BookingPage() {
   const handleSelectBarber = (barber) => {
     setSelectedBarber(barber);
     setFormErrors((prev) => ({ ...prev, barber: "" }));
-    setSelectedService((currentService) =>
-      currentService && currentService.branchId === barber.branchId
+    setSelectedService((currentService) => {
+      if (!currentService) return null;
+      const currentBranchId =
+        currentService.branchId ??
+        currentService.branch?.id ??
+        currentService.branch?._id ??
+        null;
+      const barberBranchId =
+        barber.branchId ?? barber.branch?.id ?? barber.branch?._id ?? null;
+      return currentBranchId &&
+        barberBranchId &&
+        currentBranchId === barberBranchId
         ? currentService
-        : null,
-    );
+        : null;
+    });
     setSelectedTime("");
     setSelectedSlot(null);
   };
