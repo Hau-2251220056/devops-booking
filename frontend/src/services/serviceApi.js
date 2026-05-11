@@ -1,25 +1,7 @@
 // @ts-nocheck
-import axios from "axios";
+import axiosClient from "./axiosClient";
 
-const API_URL = import.meta.env.VITE_API_URL;
-
-const serviceApiClient = axios.create({
-  baseURL: `${API_URL}/api`,
-  timeout: 10000,
-  headers: {
-    "Content-Type": "application/json",
-  },
-});
-
-serviceApiClient.interceptors.request.use((config) => {
-  const token = localStorage.getItem("token");
-
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-
-  return config;
-});
+const serviceApiClient = axiosClient;
 /**
  * Fetch all services
  * @returns {Promise} { success, message, data: [] }
