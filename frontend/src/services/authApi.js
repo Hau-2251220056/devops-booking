@@ -1,24 +1,7 @@
 // @ts-nocheck
-import axios from "axios";
+import axiosClient from "./axiosClient";
 
-const API_URL = import.meta.env.VITE_API_URL;
-
-const authApiClient = axios.create({
-  baseURL: `${API_URL}/api`,
-  timeout: 10000,
-  headers: {
-    "Content-Type": "application/json",
-  },
-});
-
-// Add token to headers if available
-authApiClient.interceptors.request.use((config) => {
-  const token = localStorage.getItem("token");
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-  return config;
-});
+const authApiClient = axiosClient;
 
 /**
  * Register new user

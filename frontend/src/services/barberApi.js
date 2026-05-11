@@ -1,14 +1,6 @@
-import axios from "axios";
+import axiosClient from "./axiosClient";
 
-const API_URL = import.meta.env.VITE_API_URL;
-
-const barberApiClient = axios.create({
-  baseURL: `${API_URL}/api`,
-  timeout: 10000,
-  headers: {
-    "Content-Type": "application/json",
-  },
-});
+const barberApiClient = axiosClient;
 
 /**
  * Fetch all barbers
